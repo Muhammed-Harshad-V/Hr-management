@@ -5,7 +5,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/userRoutes')
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3002;
 
 // Middleware
 app.use(bodyParser.json());
