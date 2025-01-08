@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const employeeRouter = require('./routes/employeesRotes')
 const leaveRequest = require('./routes/LeaveRoutes')
+const LogRoutes = require('./routes/logRoutes')
 require('dotenv').config();
 
 const app = express();
@@ -12,6 +13,7 @@ const port = process.env.PORT || 3001;
 app.use(bodyParser.json());
 app.use('/', employeeRouter)
 app.use('/', leaveRequest)
+app.use('/', LogRoutes)
 
 // MongoDB connection
 const dbURI = process.env.MURL;

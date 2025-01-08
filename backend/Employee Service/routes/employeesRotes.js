@@ -2,6 +2,7 @@ const express = require('express');
 const Employee = require('../model/employee'); // Adjust the path as necessary
 const router = express.Router();
 const auth = require('../middleware/auth')
+const bcrypt = require('bcryptjs');
 
 // Get all employees
 router.get('/employees', auth, async (req, res) => {
@@ -14,12 +15,12 @@ router.get('/employees', auth, async (req, res) => {
 });
 
 // Create a new employee
-router.post('/employees', auth, async (req, res) => {
+router.post('/employees',  async (req, res) => {
     // Destructure request body
-    const { name, email, position, department, salary, hireDate, status } = req.body;
+    const { name, email, position, department, salary, hireDate, status, password } = req.body;
   
-    // Check for missing required fields
-    if (!name || !email || !position || !department || !salary) {
+    // Check for missing required fields (including password)
+    if (!name || !email || !position || !department || !salary || !password) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
   
@@ -31,6 +32,10 @@ router.post('/employees', auth, async (req, res) => {
         return res.status(400).json({ message: 'Employee with this email already exists' });
       }
   
+      // Hash the password using bcrypt
+      const salt = await bcrypt.genSalt(10);  // Generate a salt
+      const hashedPassword = await bcrypt.hash(password, salt);  // Hash the password
+  
       // Create a new Employee document
       const employee = new Employee({
         name,
@@ -40,13 +45,26 @@ router.post('/employees', auth, async (req, res) => {
         salary,
         hireDate: hireDate || Date.now(),  // Default to current date if not provided
         status: status || 'active',  // Default to 'active' if not provided
+        password: hashedPassword,  // Store the hashed password
       });
   
       // Save the new employee to the database
       const newEmployee = await employee.save();
   
       // Return the created employee details in the response
-      res.status(201).json(newEmployee);
+      res.status(201).json({
+        message: 'Employee created successfully',
+        employee: {
+          name: newEmployee.name,
+          email: newEmployee.email,
+          position: newEmployee.position,
+          department: newEmployee.department,
+          salary: newEmployee.salary,
+          hireDate: newEmployee.hireDate,
+          status: newEmployee.status,
+        },
+      });
+  
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Error creating employee', error: err.message });

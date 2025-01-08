@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs'); // Import bcryptjs for hashing passwords
 
 const employeeSchema = new mongoose.Schema(
   {
@@ -45,6 +46,10 @@ const employeeSchema = new mongoose.Schema(
       enum: ['active', 'on_leave'], // Define status values
       default: 'active', // Default status is active
     },
+    password: {
+      type: String,
+      required: true,
+    },
     createdAt: {
       type: Date,
       default: Date.now, // Automatically set to the current date when created
@@ -58,6 +63,32 @@ const employeeSchema = new mongoose.Schema(
     timestamps: true, // Automatically create and update createdAt and updatedAt fields
   }
 );
+
+// Pre-save hook to hash the password before saving to the database
+employeeSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    try {
+      // Generate a salt
+      const salt = await bcrypt.genSalt(10);
+      // Hash the password using the salt
+      this.password = await bcrypt.hash(this.password, salt);
+      next();
+    } catch (error) {
+      next(error); // Pass errors to the next middleware
+    }
+  } else {
+    next(); // If password is not modified, skip the hashing process
+  }
+});
+
+// Method to compare a provided password with the stored hashed password
+employeeSchema.methods.comparePassword = async function (providedPassword) {
+  try {
+    return await bcrypt.compare(providedPassword, this.password);
+  } catch (error) {
+    throw new Error('Error comparing passwords');
+  }
+};
 
 // Create the Employee model from the schema
 const Employee = mongoose.model('Employee', employeeSchema);
