@@ -1,9 +1,10 @@
 const express = require('express');
 const Employee = require('../model/employee'); // Adjust the path as necessary
 const router = express.Router();
+const auth = require('../middleware/auth')
 
 // Get all employees
-router.get('/employees', async (req, res) => {
+router.get('/employees', auth, async (req, res) => {
     try {
         const employees = await Employee.find();
         res.json(employees);
@@ -13,7 +14,7 @@ router.get('/employees', async (req, res) => {
 });
 
 // Create a new employee
-router.post('/employees', async (req, res) => {
+router.post('/employees', auth, async (req, res) => {
     // Destructure request body
     const { name, email, position, department, salary, hireDate, status } = req.body;
   
@@ -53,7 +54,7 @@ router.post('/employees', async (req, res) => {
   });
 
 // Update an employee by ID
-router.put('/employees/:id', async (req, res) => {
+router.put('/employees/:id', auth, async (req, res) => {
     try {
         // Find the employee by ID
         const employee = await Employee.findById(req.params.id);
@@ -105,7 +106,7 @@ router.put('/employees/:id', async (req, res) => {
 });
 
 // Delete an employee by ID
-router.delete('/employees/:id', async (req, res) => {
+router.delete('/employees/:id', auth, async (req, res) => {
     try {
         const employee = await Employee.findById(req.params.id);
         if (!employee) {
