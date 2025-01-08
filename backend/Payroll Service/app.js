@@ -2,14 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('dotenv').config();
-const attendance = require('./Routes/attendanceRoutes')
+const payroll = require('./Routes/payrollRoutes')
 
 const app = express();
-const port = process.env.PORT || 3003;
+const port = process.env.PORT || 3004;
 
 // Middleware
 app.use(bodyParser.json());
-app.use('/', attendance)
+app.use('/', payroll)
 
 
 // MongoDB connection
