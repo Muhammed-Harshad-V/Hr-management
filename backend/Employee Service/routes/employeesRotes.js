@@ -33,8 +33,8 @@ router.post('/employees',  async (req, res) => {
       }
   
       // Hash the password using bcrypt
-      const salt = await bcrypt.genSalt(10);  // Generate a salt
-      const hashedPassword = await bcrypt.hash(password, salt);  // Hash the password
+    //   const salt = await bcrypt.genSalt(10);  // Generate a salt
+    //   const hashedPassword = await bcrypt.hash(password, salt);  // Hash the password
   
       // Create a new Employee document
       const employee = new Employee({
@@ -45,7 +45,7 @@ router.post('/employees',  async (req, res) => {
         salary,
         hireDate: hireDate || Date.now(),  // Default to current date if not provided
         status: status || 'active',  // Default to 'active' if not provided
-        password: hashedPassword,  // Store the hashed password
+        password,  // Store the hashed password
       });
   
       // Save the new employee to the database
