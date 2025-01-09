@@ -123,6 +123,7 @@ router.put('/employees/:id', auth, async (req, res) => {
     }
 });
 
+
 // Delete an employee by ID
 router.delete('/employees/:id', auth, async (req, res) => {
     try {

@@ -30,19 +30,19 @@ const payrollSchema = new Schema(
       required: true,
       default: 0
     },
-    deductions: {
-      type: [
-        {
-          type: String,  // Deduction type (e.g., "tax", "insurance")
-          amount: {
-            type: Number,
-            required: true,
-            default: 0
-          }
+    deductions: [
+      {
+        type: {
+          type: String, // Deduction type (e.g., "Tax", "Health Insurance")
+          required: true
+        },
+        amount: {
+          type: Number,
+          required: true,
+          default: 0
         }
-      ],
-      default: []
-    },
+      }
+    ],
     bonuses: {
       type: Number,
       default: 0 // Optional: Store bonuses separately (if applicable)

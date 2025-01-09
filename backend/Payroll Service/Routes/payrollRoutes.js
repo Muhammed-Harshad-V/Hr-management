@@ -17,19 +17,35 @@ router.post('/payroll/generate', auth, async (req, res) => {
 
   try {
     // Fetch worked hours from the Attendance Service
-    const attendanceRecords = await axios.get(`http://attendance-service/employee/${employeeId}`, {
-      params: { month, year }  // Pass the month and year to filter attendance records
+    const token = req.headers?.authorization?.split(" ")[1];  // "Bearer token"
+
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication token missing.' });
+    }
+
+    // Fetch employee details from Employee Service with token for authentication
+    const attendanceRecords = await axios.get(`http://localhost:3000/attendanceService/employee/${employeeId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,  // Send the token as Bearer token in Authorization header
+      }
     });
+
+    console.log(attendanceRecords)
 
     if (!attendanceRecords || attendanceRecords.data.length === 0) {
       return res.status(404).json({ error: 'No attendance records found for this employee.' });
     }
 
-    // Calculate the total worked hours for the employee
-    let totalWorkedHours = 0;
-    attendanceRecords.data.forEach(record => {
-      totalWorkedHours += record.worked_hours;
-    });
+    // Convert the object of objects to an array using Object.values()
+    const attendanceArray = Object.values(attendanceRecords.data);
+    console.log(attendanceArray)
+
+    // Calculate total worked hours by summing up all worked_hours values
+    const totalWorkedHours = attendanceArray.reduce((total, record) => {
+      return total + record.worked_hours;  // Add the worked hours of each record
+    }, 0);  // Initial value of 0 for the total
+
+    console.log(`Total Worked Hours: ${totalWorkedHours}`);
 
     // Gross salary = worked hours * hourly rate + bonus
     const grossSalary = (totalWorkedHours * hourlyRate) + bonus;

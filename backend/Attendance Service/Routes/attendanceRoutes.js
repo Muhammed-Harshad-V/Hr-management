@@ -1,6 +1,7 @@
 const express = require('express');
 const Attendance = require('../model/attendance'); // Adjust the path as necessary
 const router = express.Router();
+const auth = require('../middleware/auth')
 
 // Check-in route
 router.post('/attendance/check-in', async (req, res) => {
@@ -55,7 +56,7 @@ router.post('/attendance/check-out', async (req, res) => {
 });
 
 // Get attendance by employee ID
-router.get('/employee/:employeeId', async (req, res) => {
+router.get('/employee/:employeeId', auth, async (req, res) => {
     try {
         const { employeeId } = req.params;
         const attendanceRecords = await Attendance.find({ employee_id: employeeId });
