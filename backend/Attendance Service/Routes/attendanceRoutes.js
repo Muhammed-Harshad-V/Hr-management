@@ -2,34 +2,54 @@ const express = require('express');
 const Attendance = require('../model/attendance'); // Adjust the path as necessary
 const router = express.Router();
 const auth = require('../middleware/auth')
+const DailyAttendance = require('../model/DailyAttendance'); // New schema for daily attendance
+const eventEmitter = require('events');
 
 // Check-in route
 router.post('/attendance/check-in', async (req, res) => {
     try {
-        const { employeeId } = req.body;
-        const date = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-        const checkInTime = new Date();
+        const { employeeId, name } = req.body;
 
-        // Check if attendance for this employee already exists for today
-        const existingAttendance = await Attendance.findOne({ employee_id: employeeId, date });
+        if (!employeeId || !name) {
+            return res.status(400).send({ error: 'Employee ID and name are required' });
+        }
 
-        if (existingAttendance && existingAttendance.check_in_time) {
+        const date = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+        const checkInTime = new Date().toLocaleTimeString(); // Current time in HH:MM:SS format
+
+        // Find the document for today's attendance
+        let dailyAttendance = await DailyAttendance.findOne({ date });
+
+        if (!dailyAttendance) {
+            // Create a new daily attendance document if none exists
+            dailyAttendance = new DailyAttendance({ date, employees: [] });
+        }
+
+        // Check if the employee has already checked in
+        const alreadyCheckedIn = dailyAttendance.employees.some(emp => emp.employeeId.toString() === employeeId);
+        if (alreadyCheckedIn) {
             return res.status(400).send({ error: 'Employee has already checked in for today' });
         }
 
-        // Create a new attendance record
-        const attendance = new Attendance({
-            employee_id: employeeId,
-            date,
-            check_in_time: checkInTime,
+        // Add the employee's check-in details
+        dailyAttendance.employees.push({
+            employeeId,
+            name,
+            checkInTime,
         });
-        await attendance.save();
 
-        res.status(201).send(attendance); // Send back the attendance record
+        await dailyAttendance.save();
+
+        // Notify the frontend via SSE
+        eventEmitter.emit('newCheckIn', { employeeId, name, checkInTime });
+
+        res.status(201).send(dailyAttendance); // Send the updated daily attendance record
     } catch (error) {
-        res.status(400).send({ error: 'Error while checking in', details: error });
+        console.error('Error during check-in:', error);
+        res.status(500).send({ error: 'Error while checking in', details: error });
     }
 });
+
 
 // Check-out route (update check-out time)
 router.post('/attendance/check-out', async (req, res) => {
@@ -69,6 +89,25 @@ router.get('/employee/:employeeId', auth, async (req, res) => {
     } catch (error) {
         res.status(400).send({ error: 'Error fetching attendance records', details: error });
     }
+});
+
+
+// SSE Endpoint
+router.get('/attendance/events', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const onNewCheckIn = (data) => {
+        res.write(`New Check-in\n\n`); // Send the event data to the frontend
+    };
+
+    eventEmitter.on('newCheckIn', onNewCheckIn);
+
+    // Remove listener when the client disconnects
+    req.on('close', () => {
+        eventEmitter.removeListener('newCheckIn', onNewCheckIn);
+    });
 });
 
 module.exports = router;

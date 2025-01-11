@@ -140,4 +140,17 @@ router.delete('/employees/:id', auth, async (req, res) => {
     }
 });
 
+// Get total count of employees
+router.get('/employees/count', auth, async (req, res) => {
+  try {
+      // Get the total count of employees
+      const totalEmployees = await Employee.countDocuments();
+
+      // Return the count in the response
+      res.status(200).json({ totalEmployees });
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
