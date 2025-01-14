@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import ThemeToggle from "../../themeToggle/ThemeToggle";
+import { Link, Outlet } from "react-router-dom";
+import ThemeToggle from "../themeToggle/ThemeToggle";
 
-const Navbar = () => {
+const NavbaeComponent = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
 
   // Check window size on resize
@@ -23,13 +23,20 @@ const Navbar = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []); // Empty dependency array ensures this effect runs only once when component mounts
+  }, []);
+   
+
+  const autoclose = () => {
+      if (window.innerWidth < 1024) {
+        setIsSidebarOpen(false);
+      }
+  }
 
   return (
     <div className="h-screen flex flex-col text-black dark:text-white">
       {/* Top Navbar */}
       <header className=" text-black dark:text-white px-4 py-3 flex justify-between items-center bg-white dark:bg-black">
-        <h1 className="text-lg font-bold">Dashboard</h1>
+        <h1 className="text-lg font-bold">Admin Panel</h1>
         <div className="flex flex-row">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -50,30 +57,30 @@ const Navbar = () => {
         >
           <nav className="flex flex-col space-y-2 p-4">
             <Link
-              to="/dashboard"
+              to="/"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-              onClick={() => setIsSidebarOpen(false)} // Close sidebar on click
+              onClick={() => autoclose()} // Close sidebar on click
             >
               Dashboard
             </Link>
             <Link
               to="/settings"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-              onClick={() => setIsSidebarOpen(false)}
+              onClick={() => autoclose()}
             >
               Settings
             </Link>
             <Link
               to="/profile"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-              onClick={() => setIsSidebarOpen(false)}
+              onClick={() => autoclose()}
             >
               Profile
             </Link>
             <Link
               to="/logout"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-              onClick={() => setIsSidebarOpen(false)}
+              onClick={() => autoclose()}
             >
               Logout
             </Link>
@@ -82,13 +89,11 @@ const Navbar = () => {
 
         {/* Main Content */}
         <main className="flex-1 bg-gray-100 p-4 overflow-y-auto dark:bg-less-black dark:text-gray-300">
-          <div>
-            hiiiii
-          </div>
+          <Outlet/>
         </main>
       </div>
     </div>
   );
 };
 
-export default Navbar;
+export default NavbaeComponent;
