@@ -5,7 +5,10 @@ const employeeRouter = require('./routes/employeesRotes')
 const leaveRequest = require('./routes/LeaveRoutes')
 const LogRoutes = require('./routes/logRoutes')
 const cors = require('cors')
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
+
+
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -16,7 +19,8 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)
   }));
-  
+
+app.use(cookieParser()); 
 app.use(bodyParser.json());
 app.use('/', employeeRouter)
 app.use('/', leaveRequest)

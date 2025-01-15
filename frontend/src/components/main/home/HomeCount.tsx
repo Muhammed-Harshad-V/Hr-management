@@ -10,7 +10,9 @@ function HomeCount() {
         try {
             const employeeResponse = await APIClientPrivate.get('/employeeService/employees/count'); // Endpoint for total employees
             const checkInResponse = await APIClientPrivate.get('/attendanceService/attendance/check-in-count'); // Endpoint for today's check-ins
-            setEmployeeCount(employeeResponse.data.count || 0);
+            console.log(employeeResponse)
+            console.log(checkInResponse)
+            setEmployeeCount(employeeResponse.data.totalEmployees || 0);
             setCheckInCount(checkInResponse.data.checkInCount || 0);
         } catch (error) {
             console.error('Error fetching counts:', error);

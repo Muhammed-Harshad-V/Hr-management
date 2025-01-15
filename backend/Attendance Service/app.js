@@ -3,11 +3,22 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const attendance = require('./Routes/attendanceRoutes')
+const cors = require('cors')
+const cookieParser = require('cookie-parser');
 
 const app = express();
-const port = process.env.PORT || 3003;
+const port = process.env.PORT || 3002;
 
 // Middleware
+// Allow credentials and specify allowed origin
+app.use(cors({
+    origin: 'http://localhost:5173', // Your frontend's URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true // Allow credentials (cookies, authorization headers)
+  }));
+
+app.use(cookieParser()); 
 app.use(bodyParser.json());
 app.use('/', attendance)
 
