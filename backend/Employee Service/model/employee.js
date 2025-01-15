@@ -90,6 +90,15 @@ employeeSchema.methods.comparePassword = async function (providedPassword) {
   }
 };
 
+
+
+// const plainPassword = 'password';
+// bcrypt.genSalt(10, (err, salt) => {
+//   bcrypt.hash(plainPassword, salt, (err, hashedPassword) => {
+//     console.log('Hashed password:', hashedPassword);
+//   });
+// });
+
 // Create the Employee model from the schema
 const Employee = mongoose.model('Employee', employeeSchema);
 

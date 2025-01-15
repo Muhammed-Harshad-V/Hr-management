@@ -40,8 +40,11 @@ router.post('/login', async (req, res) => {
         // Remove the password from the response
         delete employee._doc.password;
 
-        // Set the token in a cookie
-        res.cookie('token', token);
+        res.cookie('token', token, {
+            httpOnly: true, // Prevents JS access to the cookie
+            secure: false,  // Set to `true` in production with HTTPS
+            sameSite: 'Strict', // Prevents CSRF
+          });
 
         res.send({ token, employee });
     } catch (error) {

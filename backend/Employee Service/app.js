@@ -4,16 +4,24 @@ const bodyParser = require('body-parser');
 const employeeRouter = require('./routes/employeesRotes')
 const leaveRequest = require('./routes/LeaveRoutes')
 const LogRoutes = require('./routes/logRoutes')
+const cors = require('cors')
 require('dotenv').config();
-
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Middleware
+// Allow credentials and specify allowed origin
+app.use(cors({
+    origin: 'http://localhost:5173', // Your frontend's URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true // Allow credentials (cookies, authorization headers)
+  }));
+  
 app.use(bodyParser.json());
 app.use('/', employeeRouter)
 app.use('/', leaveRequest)
 app.use('/', LogRoutes)
+
 
 // MongoDB connection
 const dbURI = process.env.MURL;

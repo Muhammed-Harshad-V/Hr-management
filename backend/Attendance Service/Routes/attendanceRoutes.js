@@ -114,7 +114,7 @@ router.get('/employee/:employeeId', auth, async (req, res) => {
 
 
 // SSE Endpoint
-router.get('/attendance/events', (req, res) => {
+router.get('/attendance/events', auth, (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -132,7 +132,7 @@ router.get('/attendance/events', (req, res) => {
 });
 
 // Route to get the number of check-ins for today
-router.get('/attendance/check-in-count', async (req, res) => {
+router.get('/attendance/check-in-count', auth, async (req, res) => {
     try {
         const date = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
         const dailyAttendance = await DailyAttendance.findOne({ date });
