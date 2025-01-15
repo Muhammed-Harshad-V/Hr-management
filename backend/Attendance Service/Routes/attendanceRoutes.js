@@ -5,50 +5,71 @@ const auth = require('../middleware/auth')
 const DailyAttendance = require('../model/DailyAttendance'); // New schema for daily attendance
 const eventEmitter = require('events');
 
-// Check-in route
+
+// Check-in Route
 router.post('/attendance/check-in', async (req, res) => {
     try {
-        const { employeeId, name } = req.body;
-
-        if (!employeeId || !name) {
-            return res.status(400).send({ error: 'Employee ID and name are required' });
-        }
-
-        const date = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
-        const checkInTime = new Date().toLocaleTimeString(); // Current time in HH:MM:SS format
-
-        // Find the document for today's attendance
-        let dailyAttendance = await DailyAttendance.findOne({ date });
-
-        if (!dailyAttendance) {
-            // Create a new daily attendance document if none exists
-            dailyAttendance = new DailyAttendance({ date, employees: [] });
-        }
-
-        // Check if the employee has already checked in
-        const alreadyCheckedIn = dailyAttendance.employees.some(emp => emp.employeeId.toString() === employeeId);
-        if (alreadyCheckedIn) {
-            return res.status(400).send({ error: 'Employee has already checked in for today' });
-        }
-
-        // Add the employee's check-in details
-        dailyAttendance.employees.push({
-            employeeId,
-            name,
-            checkInTime,
-        });
-
-        await dailyAttendance.save();
-
-        // Notify the frontend via SSE
-        eventEmitter.emit('newCheckIn', { employeeId, name, checkInTime });
-
-        res.status(201).send(dailyAttendance); // Send the updated daily attendance record
+      const { employeeId, name } = req.body;
+  
+      if (!employeeId || !name) {
+        return res.status(400).send({ error: 'Employee ID and name are required' });
+      }
+  
+      const date = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+      const checkInTime = new Date(); // Current date-time object
+  
+      // Check if the employee has already checked in for today in the Attendance model
+      const existingAttendance = await Attendance.findOne({ employee_id: employeeId, date });
+  
+      if (existingAttendance) {
+        return res.status(400).send({ error: 'Employee has already checked in for today' });
+      }
+  
+      // Create a new record in the Attendance model
+      const newAttendance = new Attendance({
+        employee_id: employeeId,
+        date,
+        check_in_time: checkInTime,
+      });
+  
+      await newAttendance.save();
+  
+      // Update the DailyAttendance model
+      let dailyAttendance = await DailyAttendance.findOne({ date });
+  
+      if (!dailyAttendance) {
+        // Create a new daily attendance document if none exists
+        dailyAttendance = new DailyAttendance({ date, employees: [] });
+      }
+  
+      // Check if the employee has already checked in in DailyAttendance
+      const alreadyCheckedIn = dailyAttendance.employees.some(
+        (emp) => emp.employeeId.toString() === employeeId
+      );
+  
+      if (alreadyCheckedIn) {
+        return res.status(400).send({ error: 'Employee has already checked in for today' });
+      }
+  
+      // Add employee's check-in details to DailyAttendance
+      dailyAttendance.employees.push({
+        employeeId,
+        name,
+        checkInTime: checkInTime.toISOString(),
+      });
+  
+      await dailyAttendance.save();
+  
+      // Notify the frontend via SSE
+      eventEmitter.emit('newCheckIn', { employeeId, name, checkInTime });
+  
+      res.status(201).send({ message: 'Check-in successful', attendance: newAttendance });
     } catch (error) {
-        console.error('Error during check-in:', error);
-        res.status(500).send({ error: 'Error while checking in', details: error });
+      console.error('Error during check-in:', error);
+      res.status(500).send({ error: 'Error while checking in', details: error });
     }
-});
+  });
+
 
 
 // Check-out route (update check-out time)
@@ -108,6 +129,24 @@ router.get('/attendance/events', (req, res) => {
     req.on('close', () => {
         eventEmitter.removeListener('newCheckIn', onNewCheckIn);
     });
+});
+
+// Route to get the number of check-ins for today
+router.get('/attendance/check-in-count', async (req, res) => {
+    try {
+        const date = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+        const dailyAttendance = await DailyAttendance.findOne({ date });
+
+        if (!dailyAttendance) {
+            return res.status(200).send({ checkInCount: 0 }); // No check-ins for today
+        }
+
+        const checkInCount = dailyAttendance.employees.length; // Count of employees checked in
+        res.status(200).send({ checkInCount });
+    } catch (error) {
+        console.error('Error fetching check-in count:', error);
+        res.status(500).send({ error: 'Failed to fetch check-in count' });
+    }
 });
 
 module.exports = router;
