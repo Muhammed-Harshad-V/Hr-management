@@ -64,11 +64,11 @@ const NavbaeComponent = () => {
               Dashboard
             </Link>
             <Link
-              to="/settings"
+              to="/employees"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
               onClick={() => autoclose()}
             >
-              Settings
+              Employees
             </Link>
             <Link
               to="/profile"
