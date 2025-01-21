@@ -67,7 +67,7 @@ function EmployeesComponent() {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by name, email, position, or department"
+          placeholder="Filter employess..."
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md w-full"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
