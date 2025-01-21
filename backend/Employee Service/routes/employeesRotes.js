@@ -128,6 +128,7 @@ router.put('/employees/:id', auth, async (req, res) => {
 router.delete('/employees/:id', auth, async (req, res) => {
     try {
         const employee = await Employee.findById(req.params.id);
+        console.log(employee)
         if (!employee) {
             return res.status(404).json({ message: 'Employee not found' });
         }

@@ -59,6 +59,20 @@ function EmployeesComponent() {
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
   const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
 
+  const handleEditEmployee = (id) => {
+    alert(`Edit employee with ID: ${id}`);
+  };
+
+  const  handleDeleteEmployee = async (id) => {
+    console.log(id)
+    try {
+      await APIClientPrivate.delete(`/employeeService/employees/${id}`);
+      fetchEmployees()
+    } catch (err) {
+      setError("Failed to Remove Employee. please try agin later.");
+    }
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Employee Directory</h1>
@@ -67,7 +81,7 @@ function EmployeesComponent() {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Filter employess..."
+          placeholder="Filter employees..."
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md w-full"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -101,6 +115,7 @@ function EmployeesComponent() {
                 <TableHead>Salary</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Hire Date</TableHead>
+                <TableHead>Actions</TableHead> {/* New Actions Column */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -124,11 +139,26 @@ function EmployeesComponent() {
                       </span>
                     </TableCell>
                     <TableCell>{new Date(employee.hireDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {/* Action buttons */}
+                      <button
+                        onClick={() => handleEditEmployee(employee._id)}
+                        className="text-blue-500 hover:text-blue-600 mr-2"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEmployee(employee._id)}
+                        className="text-red-500 hover:text-red-600"
+                      >
+                        Delete
+                      </button>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">
+                  <TableCell colSpan={8} className="text-center">
                     No employees found.
                   </TableCell>
                 </TableRow>
@@ -136,9 +166,11 @@ function EmployeesComponent() {
             </TableBody>
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={7} className="font-semibold">
+                <TableCell colSpan={8} className="font-semibold">
                   <div className="w-full flex justify-between">
-                    <Link to={"add/employee"} className="text-blue-500 hover:text-blue-600">Add Employee</Link>
+                    <Link to={"add/employee"} className="text-blue-500 hover:text-blue-600">
+                      Add Employee
+                    </Link>
                     <div>Total Employees: {filteredEmployees.length}</div>
                   </div>
                 </TableCell>
