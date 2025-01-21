@@ -4,6 +4,7 @@ import Home from "./page/home/home";
 import Login from "./page/login/Login";
 import Employees from "./page/Employees/Employees";
 import AddEmployee from "./components/main/employees/addEmployee/AddEmployee";
+import EditEmployee from "./components/main/employees/editEmployee/EditEmployee";
 
 function App() {
   const router = createBrowserRouter([
@@ -26,6 +27,10 @@ function App() {
           {
             path: "/employees/add/employee",
             element: <AddEmployee/>
+          },
+          {
+            path: "/employees/update/:id",
+            element: <EditEmployee/>
           },
         ]
     },

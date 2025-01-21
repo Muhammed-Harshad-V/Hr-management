@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 function EmployeesComponent() {
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,11 +63,10 @@ function EmployeesComponent() {
   const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
 
   const handleEditEmployee = (id) => {
-    alert(`Edit employee with ID: ${id}`);
+    navigate(`update/${id}`)
   };
 
   const  handleDeleteEmployee = async (id) => {
-    console.log(id)
     try {
       await APIClientPrivate.delete(`/employeeService/employees/${id}`);
       fetchEmployees()

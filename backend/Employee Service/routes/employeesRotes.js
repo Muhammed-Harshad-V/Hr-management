@@ -14,6 +14,19 @@ router.get('/employees', auth, async (req, res) => {
     }
 });
 
+// Get a specific employee by ID
+router.get('/employees/:id', auth, async (req, res) => {
+  try { ``
+      const employee = await Employee.findById(req.params.id);
+      if (!employee) {
+          return res.status(404).json({ message: 'Employee not found' });
+      }
+      res.json(employee);
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+});
+
 // Create a new employee
 router.post('/employees',  async (req, res) => {
     // Destructure request body
@@ -128,7 +141,6 @@ router.put('/employees/:id', auth, async (req, res) => {
 router.delete('/employees/:id', auth, async (req, res) => {
     try {
         const employee = await Employee.findById(req.params.id);
-        console.log(employee)
         if (!employee) {
             return res.status(404).json({ message: 'Employee not found' });
         }
