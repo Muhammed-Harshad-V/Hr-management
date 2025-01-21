@@ -5,6 +5,7 @@ import Login from "./page/login/Login";
 import Employees from "./page/Employees/Employees";
 import AddEmployee from "./components/main/employees/addEmployee/AddEmployee";
 import EditEmployee from "./components/main/employees/editEmployee/EditEmployee";
+import Attendance from "./page/attendance/attendance";
 
 function App() {
   const router = createBrowserRouter([
@@ -31,6 +32,10 @@ function App() {
           {
             path: "/employees/update/:id",
             element: <EditEmployee/>
+          },
+          {
+            path: "/attendance",
+            element: <Attendance/>
           },
         ]
     },

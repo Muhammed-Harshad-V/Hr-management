@@ -71,11 +71,11 @@ const NavbaeComponent = () => {
               Employees
             </Link>
             <Link
-              to="/profile"
+              to="/attendance"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
               onClick={() => autoclose()}
             >
-              Profile
+              attendance
             </Link>
             <Link
               to="/logout"
