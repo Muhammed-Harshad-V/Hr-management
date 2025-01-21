@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import APIClientPrivate from "@/api/axios";
-
-import { Table, TableBody,  TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Link } from "react-router-dom";
 
 function EmployeesComponent() {
   const [employees, setEmployees] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); // You can adjust the page size here
   
-
   // Fetch employees from the backend
   const fetchEmployees = async () => {
     try {
@@ -29,9 +31,48 @@ function EmployeesComponent() {
     fetchEmployees();
   }, []);
 
+  // Filter employees based on search term
+  useEffect(() => {
+    if (searchTerm) {
+      setFilteredEmployees(
+        employees.filter((employee) =>
+          employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          employee.salary.toString().includes(searchTerm.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredEmployees(employees);
+    }
+  }, [searchTerm, employees]);
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  // Get current employees to be displayed on the page
+  const indexOfLastEmployee = currentPage * itemsPerPage;
+  const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
+  const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Employee Directory</h1>
+
+      {/* Search Bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by name, email, position, or department"
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md w-full"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
 
       {loading ? (
         <p className="text-center text-blue-500">Loading...</p>
@@ -63,8 +104,8 @@ function EmployeesComponent() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {employees.length > 0 ? (
-                employees.map((employee) => (
+              {currentEmployees.length > 0 ? (
+                currentEmployees.map((employee) => (
                   <TableRow key={employee._id}>
                     <TableCell>{employee.name}</TableCell>
                     <TableCell>{employee.email}</TableCell>
@@ -95,12 +136,34 @@ function EmployeesComponent() {
             </TableBody>
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={7} className="text-right font-semibold">
-                  Total Employees: {employees.length}
+                <TableCell colSpan={7} className="font-semibold">
+                  <div className="w-full flex justify-between">
+                    <Link to={"add/employee"} className="text-blue-500 hover:text-blue-600">Add Employee</Link>
+                    <div>Total Employees: {filteredEmployees.length}</div>
+                  </div>
                 </TableCell>
               </TableRow>
             </TableFooter>
           </Table>
+
+          {/* Centered Pagination */}
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-2 text-sm dark:bg-gray-800 bg-white rounded-l-md hover:bg-gray-400"
+            >
+              Previous
+            </button>
+            <span className="px-4">{currentPage}</span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage * itemsPerPage >= filteredEmployees.length}
+              className="p-2 text-sm dark:bg-gray-800 rounded-r-md hover:bg-gray-400"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

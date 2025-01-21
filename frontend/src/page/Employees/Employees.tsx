@@ -1,4 +1,4 @@
-import EmployeesComponent from '@/components/main/employees/EmployeesComponent'
+import EmployeesComponent from '@/components/main/employees/formSection/EmployeesComponent'
 
 function Employees() {
   return (

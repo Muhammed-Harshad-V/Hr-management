@@ -3,6 +3,7 @@ import Navbar from "./page/navbar/navbar";
 import Home from "./page/home/home";
 import Login from "./page/login/Login";
 import Employees from "./page/Employees/Employees";
+import AddEmployee from "./components/main/employees/addEmployee/AddEmployee";
 
 function App() {
   const router = createBrowserRouter([
@@ -21,6 +22,10 @@ function App() {
           {
             path: "/employees",
             element: <Employees/>
+          },
+          {
+            path: "/employees/add/employee",
+            element: <AddEmployee/>
           },
         ]
     },
