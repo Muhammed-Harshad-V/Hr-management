@@ -136,6 +136,54 @@ router.get('/payroll', auth, async (req, res) => {
   }
 });
 
+// Get specific payroll by ID
+router.get('/payroll/:id', auth, async (req, res) => {
+  const { id } = req.params; // Get payroll ID from URL parameter
 
+  try {
+    // Fetch the payroll record by ID
+    const payroll = await Payroll.findById(id);
+
+    if (!payroll) {
+      return res.status(404).json({ message: 'Payroll record not found.' });
+    }
+
+    res.json(payroll);
+  } catch (error) {
+    console.error('Error fetching payroll by ID:', error);
+    res.status(500).json({ message: 'Error fetching payroll record.', error: error.message });
+  }
+});
+
+// Update specific payroll by ID (only status change)
+router.put('/payroll/:id', auth, async (req, res) => {
+  const { id } = req.params; // Get payroll ID from URL parameter
+  const { status } = req.body; // Get the new status from request body
+
+  // Ensure the status is valid
+  if (!['pending', 'processed', 'paid', 'failed'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status value.' });
+  }
+
+  try {
+    // Find the payroll record by ID
+    const payroll = await Payroll.findById(id);
+
+    if (!payroll) {
+      return res.status(404).json({ message: 'Payroll record not found.' });
+    }
+
+    // Update the status
+    payroll.status = status;
+
+    // Save the updated payroll record
+    await payroll.save();
+
+    res.json({ message: 'Payroll status updated successfully.', payroll });
+  } catch (error) {
+    console.error('Error updating payroll status:', error);
+    res.status(500).json({ message: 'Error updating payroll status.', error: error.message });
+  }
+});
 
 module.exports = router;
