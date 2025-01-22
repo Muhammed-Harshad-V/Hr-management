@@ -72,8 +72,6 @@ router.post('/attendance/check-in', async (req, res) => {
   }
 });
 
-
-
 // Check-out route (update check-out time)
 router.post('/attendance/check-out', async (req, res) => {
     try {
@@ -145,10 +143,6 @@ router.get('/attendance', auth, async (req, res) => {
   }
 });
 
-
-
-
-
 // SSE Endpoint
 router.get('/attendance/events', auth, (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
@@ -184,5 +178,37 @@ router.get('/attendance/check-in-count', auth, async (req, res) => {
         res.status(500).send({ error: 'Failed to fetch check-in count' });
     }
 });
+
+// Route to fetch attendance records for the given month
+router.get('/attendance/month', async (req, res) => {
+  try {
+    const { startOfMonth, endOfMonth } = req.query;
+
+    if (!startOfMonth || !endOfMonth) {
+      return res.status(400).json({ error: 'Both startOfMonth and endOfMonth are required.' });
+    }
+
+    // Fetch attendance records for the given month
+    const attendanceRecords = await Attendance.find({
+      date: { $gte: new Date(startOfMonth), $lte: new Date(endOfMonth) },
+    });
+
+    if (!attendanceRecords.length) {
+      return res.status(404).json({ error: 'No attendance records found for the given period.' });
+    }
+
+    // Send attendance data with employee details
+    res.status(200).json(attendanceRecords.map(record => ({
+      employee_id: record.employee_id,
+      employee_name: record.employee_name,
+      worked_hours: record.worked_hours,
+    })));
+
+  } catch (error) {
+    console.error('Error fetching attendance records:', error);
+    res.status(500).json({ error: 'Error fetching attendance records.' });
+  }
+});
+
 
 module.exports = router;

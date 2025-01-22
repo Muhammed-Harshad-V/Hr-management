@@ -1,79 +1,90 @@
 const express = require('express');
 const axios = require('axios'); // Used to call Attendance Service
+const moment = require('moment');
 const Payroll = require('../model/payroll'); // Your Payroll model
 const router = express.Router();
 const auth = require('../middleware/auth')
 
-// Generate Payroll for an employee
+
+// Generate Payroll for all employees based on attendance data from Attendance Service
 router.post('/payroll/generate', auth, async (req, res) => {
-  const { 
-    employeeId, 
-    month, 
-    year, 
-    hourlyRate, 
-    deductions = [],  // Deductions passed as an array of objects
-    bonus = 0          // Optional bonus, defaulting to 0 if not provided
-  } = req.body;
+  const { month, year, hourlyRate, deductions = [], bonus = 0 } = req.body;
 
   try {
-    // Fetch worked hours from the Attendance Service
+    // Calculate the start and end of the month based on the provided month and year
+    const startOfMonth = moment().month(month - 1).year(year).startOf('month').toDate();
+    const endOfMonth = moment().month(month - 1).year(year).endOf('month').toDate();
+
+    // Fetch attendance records for the given month from Attendance Service
     const token = req.headers?.authorization?.split(" ")[1];  // "Bearer token"
 
     if (!token) {
       return res.status(401).json({ error: 'Authentication token missing.' });
     }
 
-    // Fetch employee details from Employee Service with token for authentication
-    const attendanceRecords = await axios.get(`http://localhost:3000/attendanceService/employee/${employeeId}`, {
+    // Fetch all attendance records for the given month from Attendance Service
+    const attendanceResponse = await axios.get('http://localhost:3000/attendanceService/attendance/month', {
+      params: { startOfMonth, endOfMonth },
       headers: {
         Authorization: `Bearer ${token}`,  // Send the token as Bearer token in Authorization header
       }
     });
 
-    console.log(attendanceRecords)
-
-    if (!attendanceRecords || attendanceRecords.data.length === 0) {
-      return res.status(404).json({ error: 'No attendance records found for this employee.' });
+    if (!attendanceResponse.data || attendanceResponse.data.length === 0) {
+      return res.status(404).json({ error: 'No attendance records found for the given period.' });
     }
 
-    // Convert the object of objects to an array using Object.values()
-    const attendanceArray = Object.values(attendanceRecords.data);
-    console.log(attendanceArray)
+    const attendanceRecords = attendanceResponse.data;
 
-    // Calculate total worked hours by summing up all worked_hours values
-    const totalWorkedHours = attendanceArray.reduce((total, record) => {
-      return total + record.worked_hours;  // Add the worked hours of each record
-    }, 0);  // Initial value of 0 for the total
+    // Proceed to generate payroll for each attendance record
+    const payrollRecords = [];
 
-    console.log(`Total Worked Hours: ${totalWorkedHours}`);
+    // Group attendance records by employee_id
+    const groupedAttendance = attendanceRecords.reduce((acc, record) => {
+      const employeeId = record.employee_id.toString();
+      if (!acc[employeeId]) acc[employeeId] = {
+        employee_name: record.employee_name, // Directly include employee_name
+        totalWorkedHours: 0
+      };
+      acc[employeeId].totalWorkedHours += record.worked_hours;
+      return acc;
+    }, {});
 
-    // Gross salary = worked hours * hourly rate + bonus
-    const grossSalary = (totalWorkedHours * hourlyRate) + bonus;
+    // Loop through all employees' attendance records to calculate payroll
+    for (const employeeId in groupedAttendance) {
+      const { employee_name, totalWorkedHours } = groupedAttendance[employeeId];
 
-    // Calculate total deductions
-    let totalDeductions = 0;
-    deductions.forEach(deduction => {
-      totalDeductions += deduction.amount;
-    });
+      // Gross salary = worked hours * hourly rate + bonus
+      const grossSalary = (totalWorkedHours * hourlyRate) + bonus;
 
-    // Net salary = gross salary - total deductions
-    const netSalary = grossSalary - totalDeductions;
+      // Calculate total deductions
+      let totalDeductions = 0;
+      deductions.forEach(deduction => {
+        totalDeductions += deduction.amount;
+      });
 
-    // Save the payroll record in the database
-    const payroll = new Payroll({
-      employee_id: employeeId,
-      month,
-      year,
-      gross_salary: grossSalary,
-      net_salary: netSalary,
-      deductions,  // Store all deductions as an array of objects
-      bonuses: bonus,  // Save the bonus amount
-    });
+      // Net salary = gross salary - total deductions
+      const netSalary = grossSalary - totalDeductions;
 
-    await payroll.save();
+      // Save the payroll record for this employee
+      const payroll = new Payroll({
+        employee_id: employeeId,
+        employee_name,
+        month,
+        year,
+        gross_salary: grossSalary,
+        net_salary: netSalary,
+        deductions,
+        bonuses: bonus,
+        status: 'pending', // default status
+      });
 
-    // Return the generated payroll details
-    res.status(201).json(payroll);
+      await payroll.save();
+      payrollRecords.push(payroll);
+    }
+
+    // Return the generated payroll details for all employees
+    res.status(201).json({ message: 'Payroll generated successfully.', payrollRecords });
 
   } catch (error) {
     console.error('Error generating payroll:', error);
@@ -81,32 +92,6 @@ router.post('/payroll/generate', auth, async (req, res) => {
   }
 });
 
-// Get payroll for an employee by employee ID (and optionally filter by month/year)
-router.get('/payroll/employee/:employeeId', async (req, res) => {
-    const { employeeId } = req.params;
-    const { month, year } = req.query;  // Optionally get month and year as query params
-  
-    try {
-      let filter = { employee_id: employeeId };
-  
-      // Add month and year filters if provided
-      if (month) filter.month = month;
-      if (year) filter.year = year;
-  
-      // Fetch the payroll records from the database
-      const payrollRecords = await Payroll.find(filter);
-  
-      if (!payrollRecords || payrollRecords.length === 0) {
-        return res.status(404).json({ error: 'No payroll records found for this employee.' });
-      }
-  
-      // Return the payroll records
-      res.status(200).json(payrollRecords);
-  
-    } catch (error) {
-      console.error('Error fetching payroll records:', error);
-      res.status(500).json({ error: 'Error fetching payroll records' });
-    }
-  });
+
 
 module.exports = router;

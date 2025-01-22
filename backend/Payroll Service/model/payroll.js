@@ -9,6 +9,10 @@ const payrollSchema = new Schema(
       required: true,
       ref: 'Employee' // Reference to the Employee collection
     },
+    employee_name: {
+      type: String,
+      required: true,
+    },
     month: {
       type: Number,
       required: true,
@@ -46,6 +50,12 @@ const payrollSchema = new Schema(
     bonuses: {
       type: Number,
       default: 0 // Optional: Store bonuses separately (if applicable)
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: ['pending', 'processed', 'paid', 'failed'], // Enum of possible status values
+      default: 'pending' // Default to 'pending' when payroll is first created
     },
     createdAt: {
       type: Date,
