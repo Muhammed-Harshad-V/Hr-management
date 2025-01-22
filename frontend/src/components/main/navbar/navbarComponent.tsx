@@ -75,14 +75,14 @@ const NavbaeComponent = () => {
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
               onClick={() => autoclose()}
             >
-              attendance
+              Attendance
             </Link>
             <Link
-              to="/logout"
+              to="/payroll"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
               onClick={() => autoclose()}
             >
-              Logout
+              Payroll
             </Link>
           </nav>
         </div>

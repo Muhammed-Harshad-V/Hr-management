@@ -7,6 +7,7 @@ import AddEmployee from "./components/main/employees/addEmployee/AddEmployee";
 import EditEmployee from "./components/main/employees/editEmployee/EditEmployee";
 import Attendance from "./page/attendance/attendance";
 import GeneratePayroll from "./components/main/payroll/PayrollGenerate/PayrollGenerate";
+import Payroll from "./page/payroll/payroll";
 
 function App() {
   const router = createBrowserRouter([
@@ -41,6 +42,10 @@ function App() {
           {
             path: "/payroll/generate",
             element: <GeneratePayroll/>
+          },
+          {
+            path: "/payroll",
+            element: <Payroll/>
           },
         ]
     },

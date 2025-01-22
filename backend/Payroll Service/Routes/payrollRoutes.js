@@ -104,6 +104,38 @@ router.post('/payroll/generate', auth, async (req, res) => {
   }
 });
 
+// Get payroll records with optional filters for employee, month, year
+router.get('/payroll', auth, async (req, res) => {
+  try {
+    const { month, year, employee_name } = req.query;
+
+    let filter = {};
+
+    // Filter by month and year
+    if (month && year) {
+      filter.month = parseInt(month);
+      filter.year = parseInt(year);
+    }
+
+    // Filter by employee_name (case-insensitive)
+    if (employee_name) {
+      filter.employee_name = { $regex: employee_name, $options: 'i' };
+    }
+
+    // Fetch payroll records based on filter
+    const payrollRecords = await Payroll.find(filter);
+
+    if (payrollRecords.length === 0) {
+      return res.status(404).json({ message: 'No payroll records found for the given criteria' });
+    }
+
+    res.json(payrollRecords);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'An error occurred while fetching payroll records', error: err.message });
+  }
+});
+
 
 
 module.exports = router;
