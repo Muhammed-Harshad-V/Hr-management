@@ -16,7 +16,7 @@ router.post('/payroll/generate', auth, async (req, res) => {
     const endOfMonth = moment().month(month - 1).year(year).endOf('month').toDate();
 
     // Fetch attendance records for the given month from Attendance Service
-    const token = req.headers?.authorization?.split(" ")[1];  // "Bearer token"
+    const token = req.cookies?.token || req.headers?.authorization?.split(' ')[1];
 
     if (!token) {
       return res.status(401).json({ error: 'Authentication token missing.' });
@@ -36,9 +36,6 @@ router.post('/payroll/generate', auth, async (req, res) => {
 
     const attendanceRecords = attendanceResponse.data;
 
-    // Proceed to generate payroll for each attendance record
-    const payrollRecords = [];
-
     // Group attendance records by employee_id
     const groupedAttendance = attendanceRecords.reduce((acc, record) => {
       const employeeId = record.employee_id.toString();
@@ -50,9 +47,24 @@ router.post('/payroll/generate', auth, async (req, res) => {
       return acc;
     }, {});
 
-    // Loop through all employees' attendance records to calculate payroll
+    // Generate payroll for each employee, but only create one record per employee per month
+    const payrollRecords = [];
+
     for (const employeeId in groupedAttendance) {
       const { employee_name, totalWorkedHours } = groupedAttendance[employeeId];
+
+      // Check if the payroll already exists for this employee in the given month and year
+      const existingPayroll = await Payroll.findOne({
+        employee_id: employeeId,
+        month: month,
+        year: year
+      });
+
+      if (existingPayroll) {
+        // If payroll exists, skip creating a new one
+        console.log(`Payroll already generated for employee ${employee_name} for the month ${month}/${year}`);
+        continue;
+      }
 
       // Gross salary = worked hours * hourly rate + bonus
       const grossSalary = (totalWorkedHours * hourlyRate) + bonus;

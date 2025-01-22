@@ -3,11 +3,13 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const payroll = require('./Routes/payrollRoutes')
+const cookieParser = require('cookie-parser');
 
 const app = express();
-const port = process.env.PORT || 3004;
+const port = process.env.PORT || 3003;
 
 // Middleware
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use('/', payroll)
 
