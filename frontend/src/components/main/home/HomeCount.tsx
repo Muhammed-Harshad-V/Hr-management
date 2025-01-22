@@ -8,7 +8,9 @@ function HomeCount() {
     // Fetch data from the server
     const fetchCounts = async () => {
         try {
-            const employeeResponse = await APIClientPrivate.get('/employeeService/employees/count'); // Endpoint for total employees
+            console.log('Fetching employee count...');
+            const employeeResponse = await APIClientPrivate.get('/employeeService/employees/count');
+            console.log('Employee count response:', employeeResponse);
             const checkInResponse = await APIClientPrivate.get('/attendanceService/attendance/check-in-count'); // Endpoint for today's check-ins
             console.log(employeeResponse)
             console.log(checkInResponse)
@@ -21,7 +23,7 @@ function HomeCount() {
 
     // Setup SSE listener
     const setupSSE = () => {
-        const eventSource = new EventSource('/attendance/events');
+        const eventSource = new EventSource('/attendanceService/attendance/events');
 
         eventSource.onmessage = () => {
             console.log('New check-in detected, refetching counts...');

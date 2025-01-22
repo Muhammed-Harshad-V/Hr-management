@@ -45,49 +45,49 @@ app.listen(port, () => {
 
 
 
-// Function to generate attendance data for the month of January 2025 for 5 employees
-const generateAttendanceData = async () => {
-    const employees = [
-      { id: new mongoose.Types.ObjectId(), name: "Alice Johnson" },
-      { id: new mongoose.Types.ObjectId(), name: "Bob Smith" },
-      { id: new mongoose.Types.ObjectId(), name: "Charlie Brown" },
-      { id: new mongoose.Types.ObjectId(), name: "David Wilson" },
-      { id: new mongoose.Types.ObjectId(), name: "Emma Davis" },
-    ];
+// // Function to generate attendance data for the month of January 2025 for 5 employees
+// const generateAttendanceData = async () => {
+//     const employees = [
+//       { id: new mongoose.Types.ObjectId(), name: "Alice Johnson" },
+//       { id: new mongoose.Types.ObjectId(), name: "Bob Smith" },
+//       { id: new mongoose.Types.ObjectId(), name: "Charlie Brown" },
+//       { id: new mongoose.Types.ObjectId(), name: "David Wilson" },
+//       { id: new mongoose.Types.ObjectId(), name: "Emma Davis" },
+//     ];
   
-    const startDate = new Date("2025-01-01");
-    const endDate = new Date("2025-01-31");
+//     const startDate = new Date("2025-01-01");
+//     const endDate = new Date("2025-01-31");
   
-    for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
-      // Generate attendance for each employee for the given date
-      for (let employee of employees) {
-        const checkInTime = new Date(date);
-        checkInTime.setHours(8 + Math.floor(Math.random() * 2)); // Random check-in time between 8:00 AM and 9:00 AM
-        checkInTime.setMinutes(Math.floor(Math.random() * 60));
+//     for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+//       // Generate attendance for each employee for the given date
+//       for (let employee of employees) {
+//         const checkInTime = new Date(date);
+//         checkInTime.setHours(8 + Math.floor(Math.random() * 2)); // Random check-in time between 8:00 AM and 9:00 AM
+//         checkInTime.setMinutes(Math.floor(Math.random() * 60));
   
-        const checkOutTime = new Date(date);
-        checkOutTime.setHours(16 + Math.floor(Math.random() * 3)); // Random check-out time between 4:00 PM and 6:00 PM
-        checkOutTime.setMinutes(Math.floor(Math.random() * 60));
+//         const checkOutTime = new Date(date);
+//         checkOutTime.setHours(16 + Math.floor(Math.random() * 3)); // Random check-out time between 4:00 PM and 6:00 PM
+//         checkOutTime.setMinutes(Math.floor(Math.random() * 60));
   
-        // Create an attendance document
-        const attendanceRecord = new Attendance({
-          employee_id: employee.id,
-          employee_name: employee.name,
-          date: new Date(date),
-          check_in_time: checkInTime,
-          check_out_time: checkOutTime,
-          worked_hours: 0, // The worked_hours will be calculated automatically by the pre-save hook
-        });
+//         // Create an attendance document
+//         const attendanceRecord = new Attendance({
+//           employee_id: employee.id,
+//           employee_name: employee.name,
+//           date: new Date(date),
+//           check_in_time: checkInTime,
+//           check_out_time: checkOutTime,
+//           worked_hours: 0, // The worked_hours will be calculated automatically by the pre-save hook
+//         });
   
-        // Save the attendance record
-        await attendanceRecord.save();
-        console.log(`Attendance saved for ${employee.name} on ${date.toLocaleDateString()}`);
-      }
-    }
-    console.log("Attendance data generation complete.");
-  };
+//         // Save the attendance record
+//         await attendanceRecord.save();
+//         console.log(`Attendance saved for ${employee.name} on ${date.toLocaleDateString()}`);
+//       }
+//     }
+//     console.log("Attendance data generation complete.");
+//   };
   
-  // Call the function to generate and insert data
-  generateAttendanceData().catch(err => {
-    console.error("Error generating data:", err);
-  });
+//   // Call the function to generate and insert data
+//   generateAttendanceData().catch(err => {
+//     console.error("Error generating data:", err);
+//   });
