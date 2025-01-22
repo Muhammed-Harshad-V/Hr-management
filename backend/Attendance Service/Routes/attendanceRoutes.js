@@ -98,26 +98,22 @@ router.post('/attendance/check-out', async (req, res) => {
     }
 });
 
-// Combined Attendance API
 router.get('/attendance', auth, async (req, res) => {
   try {
-    const { date, month, employee_name } = req.query;  // Get query params for date, month, or employee_name
+    const { start_date, end_date, employee_name } = req.query;  // Get query params for start_date, end_date, or employee_name
 
     let filter = {};
 
-    // If a specific date is provided, filter by that date
-    if (date) {
-      filter.date = new Date(date); // Convert the string date to a Date object
+    // If a start_date and end_date are provided, filter by that date range
+    if (start_date && end_date) {
+      filter.date = { 
+        $gte: new Date(start_date),  // Greater than or equal to start_date
+        $lt: new Date(end_date)      // Less than end_date
+      };
     }
-
-    // If a specific month is provided, filter by that month
-    else if (month) {
-      const startDate = new Date(month);
-      startDate.setDate(1);  // Set the first day of the month
-      const endDate = new Date(startDate);
-      endDate.setMonth(endDate.getMonth() + 1);  // Get the first day of the next month
-
-      filter.date = { $gte: startDate, $lt: endDate }; // Filter for the whole month
+    // If a specific date is provided, filter by that date
+    else if (start_date) {
+      filter.date = new Date(start_date); // Filter by the specific date
     }
 
     // If no date or month is provided, default to today's date
@@ -132,7 +128,6 @@ router.get('/attendance', auth, async (req, res) => {
 
     // If employee_name is provided, filter attendance by employee name
     if (employee_name) {
-      // Filter attendance records by employee name
       filter.employee_name = { $regex: employee_name, $options: 'i' };  // Case-insensitive search
     }
 
@@ -149,6 +144,7 @@ router.get('/attendance', auth, async (req, res) => {
     res.status(500).json({ message: 'An error occurred while fetching attendance', error: err.message });
   }
 });
+
 
 
 

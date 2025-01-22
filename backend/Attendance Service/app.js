@@ -5,7 +5,8 @@ require('dotenv').config();
 const attendance = require('./Routes/attendanceRoutes')
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
-
+const faker = require('@faker-js/faker');
+const Attendance = require('./model/attendance'); // Adjust the path as necessary
 const app = express();
 const port = process.env.PORT || 3002;
 
@@ -39,116 +40,54 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
+// Connect to MongoDB shell or use a MongoDB client like MongoDB Compass
 
 
-// const Attendance = require('./model/attendance');  // Replace with your model file path
 
-// const attendanceData = [
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-01T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-01T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-01T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-01T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-01T18:00:00.000+00:00",
-//       "__v": 0
-//     },
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-02T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-02T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-02T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-02T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-02T18:00:00.000+00:00",
-//       "__v": 0
-//     },
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-03T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-03T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-03T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-03T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-03T18:00:00.000+00:00",
-//       "__v": 0
-//     },
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-04T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-04T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-04T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-04T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-04T18:00:00.000+00:00",
-//       "__v": 0
-//     },
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-05T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-05T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-05T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-05T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-05T18:00:00.000+00:00",
-//       "__v": 0
-//     },
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-06T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-06T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-06T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-06T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-06T18:00:00.000+00:00",
-//       "__v": 0
-//     },
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-07T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-07T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-07T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-07T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-07T18:00:00.000+00:00",
-//       "__v": 0
-//     },
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-08T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-08T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-08T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-08T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-08T18:00:00.000+00:00",
-//       "__v": 0
-//     },
-//     {
-//       "employee_id": "677f891865dd33581af70929",
-//       "date": "2025-01-09T00:00:00.000+00:00",
-//       "check_in_time": "2025-01-09T08:00:00.000+00:00",
-//       "check_out_time": "2025-01-09T18:00:00.000+00:00",
-//       "worked_hours": 10,
-//       "createdAt": "2025-01-09T08:00:00.000+00:00",
-//       "updatedAt": "2025-01-09T18:00:00.000+00:00",
-//       "__v": 0
-//     }
-//   ];
+
+// Function to generate attendance data for the month of January 2025 for 5 employees
+const generateAttendanceData = async () => {
+    const employees = [
+      { id: new mongoose.Types.ObjectId(), name: "Alice Johnson" },
+      { id: new mongoose.Types.ObjectId(), name: "Bob Smith" },
+      { id: new mongoose.Types.ObjectId(), name: "Charlie Brown" },
+      { id: new mongoose.Types.ObjectId(), name: "David Wilson" },
+      { id: new mongoose.Types.ObjectId(), name: "Emma Davis" },
+    ];
   
-
-// mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-//   .then(() => {
-//     Attendance.insertMany(attendanceData)
-//       .then(result => {
-//         console.log('Data inserted successfully:', result);
-//         mongoose.disconnect();
-//       })
-//       .catch(err => {
-//         console.error('Error inserting data:', err);
-//         mongoose.disconnect();
-//       });
-//   })
-//   .catch(err => {
-//     console.error('Database connection error:', err);
-//   });
+    const startDate = new Date("2025-01-01");
+    const endDate = new Date("2025-01-31");
+  
+    for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+      // Generate attendance for each employee for the given date
+      for (let employee of employees) {
+        const checkInTime = new Date(date);
+        checkInTime.setHours(8 + Math.floor(Math.random() * 2)); // Random check-in time between 8:00 AM and 9:00 AM
+        checkInTime.setMinutes(Math.floor(Math.random() * 60));
+  
+        const checkOutTime = new Date(date);
+        checkOutTime.setHours(16 + Math.floor(Math.random() * 3)); // Random check-out time between 4:00 PM and 6:00 PM
+        checkOutTime.setMinutes(Math.floor(Math.random() * 60));
+  
+        // Create an attendance document
+        const attendanceRecord = new Attendance({
+          employee_id: employee.id,
+          employee_name: employee.name,
+          date: new Date(date),
+          check_in_time: checkInTime,
+          check_out_time: checkOutTime,
+          worked_hours: 0, // The worked_hours will be calculated automatically by the pre-save hook
+        });
+  
+        // Save the attendance record
+        await attendanceRecord.save();
+        console.log(`Attendance saved for ${employee.name} on ${date.toLocaleDateString()}`);
+      }
+    }
+    console.log("Attendance data generation complete.");
+  };
+  
+  // Call the function to generate and insert data
+  generateAttendanceData().catch(err => {
+    console.error("Error generating data:", err);
+  });

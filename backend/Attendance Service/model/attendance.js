@@ -15,7 +15,6 @@ const attendanceSchema = new Schema(
     date: {
       type: Date,
       required: true,
-      unique: true, // Ensures only one record per employee per day
     },
     check_in_time: {
       type: Date,

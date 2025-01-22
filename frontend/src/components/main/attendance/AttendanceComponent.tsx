@@ -4,22 +4,25 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { useNavigate } from "react-router-dom";
 
 function AttendanceComponent() {
-  const navigate = useNavigate();
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filterDate, setFilterDate] = useState("");
+  const [filterStartDate, setFilterStartDate] = useState(""); // Start date of the range
+  const [filterEndDate, setFilterEndDate] = useState(""); // End date of the range
   const [filterEmployee, setFilterEmployee] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Adjust the number of records per page
+  const [itemsPerPage] = useState(10); // Adjust the number of records per page
   
-  // Fetch attendance data based on filters (e.g., specific date or employee)
+  // Fetch attendance data based on filters (date range or specific employee)
   const fetchAttendance = async () => {
     try {
       setLoading(true);
       const params = {};
-      if (filterDate) params.date = filterDate;
-      if (filterEmployee) params.employee_id = filterEmployee;
+      if (filterStartDate && filterEndDate) {
+        params.start_date = filterStartDate;
+        params.end_date = filterEndDate;
+      }
+      if (filterEmployee) params.employee_name = filterEmployee;
 
       const response = await APIClientPrivate.get("/attendanceService/attendance", { params });
       setAttendanceData(response.data || []);
@@ -34,7 +37,7 @@ function AttendanceComponent() {
 
   useEffect(() => {
     fetchAttendance();
-  }, [filterDate, filterEmployee]);
+  }, [filterStartDate, filterEndDate]);
 
   // Handle page change
   const handlePageChange = (newPage) => {
@@ -46,24 +49,38 @@ function AttendanceComponent() {
   const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
   const currentAttendance = attendanceData.slice(indexOfFirstRecord, indexOfLastRecord);
 
+  // Trigger search only when Enter key is pressed in the employee name input
+  const handleEmployeeSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      fetchAttendance(); // Trigger the search when Enter is pressed
+    }
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
 
       {/* Filter Bar */}
-      <div className="mb-4">
+      <div className="mb-4 items-center">
         <input
           type="date"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2"
-          value={filterDate}
-          onChange={(e) => setFilterDate(e.target.value)}
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2"
+          value={filterStartDate}
+          onChange={(e) => setFilterStartDate(e.target.value)}
+        />
+        <input
+          type="date"
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2"
+          value={filterEndDate}
+          onChange={(e) => setFilterEndDate(e.target.value)}
         />
         <input
           type="text"
-          placeholder="Filter by Employee ID"
+          placeholder="Filter by Name"
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md"
           value={filterEmployee}
           onChange={(e) => setFilterEmployee(e.target.value)}
+          onKeyDown={handleEmployeeSearchKeyDown}  // Trigger search on Enter key press
         />
       </div>
 
@@ -87,7 +104,7 @@ function AttendanceComponent() {
               {currentAttendance.length > 0 ? (
                 currentAttendance.map((attendance) => (
                   <TableRow key={attendance._id}>
-                    <TableCell>{attendance.employee_id?.name}</TableCell>
+                    <TableCell>{attendance.employee_name}</TableCell>
                     <TableCell>{new Date(attendance.date).toLocaleDateString()}</TableCell>
                     <TableCell>{new Date(attendance.check_in_time).toLocaleTimeString()}</TableCell>
                     <TableCell>{attendance.check_out_time ? new Date(attendance.check_out_time).toLocaleTimeString() : "N/A"}</TableCell>
