@@ -91,52 +91,6 @@ router.put('/leaveRequests/:id', auth, async (req, res) => {
     }
 });
 
-  // specific leave request 
-router.get('/leaveRequests/all/:employeeId', auth, async (req, res) => {
-    try {
-        const { employeeId } = req.params;  // Get the employeeId from the URL
-        const { startDate, endDate } = req.query;  // Get startDate and endDate from query parameters
-
-        // Prepare the filter object
-        const filter = { employeeId };  // Filter by employeeId
-
-        // If both startDate and endDate are provided, apply the date range filter
-        if (startDate && endDate) {
-            filter.startDate = { $gte: new Date(startDate) };  // start date greater than or equal to
-            filter.endDate = { $lte: new Date(endDate) };  // end date less than or equal to
-        }
-
-        // Fetch the leave requests for this employee (with or without date range)
-        const leaveRequests = await LeaveRequest.find(filter);
-
-        if (!leaveRequests || leaveRequests.length === 0) {
-            return res.status(404).json({ message: 'No leave requests found for this employee.' });
-        }
-
-        // Categorize the leave requests by status
-        const categorizedRequests = {
-            approved: [],
-            rejected: [],
-            pending: []
-        };
-
-        leaveRequests.forEach(request => {
-            if (request.status === 'approved') {
-                categorizedRequests.approved.push(request);
-            } else if (request.status === 'rejected') {
-                categorizedRequests.rejected.push(request);
-            } else if (request.status === 'pending') {
-                categorizedRequests.pending.push(request);
-            }
-        });
-
-        // Send the categorized leave requests
-        res.status(200).json(categorizedRequests);
-    } catch (err) {
-        console.error("Error fetching leave requests:", err);
-        res.status(500).json({ message: err.message });
-    }
-});
 
   // all leave request
 router.get('/leaveRequests/status/overview', async (req, res) => {
