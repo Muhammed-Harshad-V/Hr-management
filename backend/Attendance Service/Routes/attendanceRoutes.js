@@ -210,5 +210,25 @@ router.get('/attendance/month', async (req, res) => {
   }
 });
 
+// Route to fetch today's attendance data
+router.get('/attendance/daily', auth, async (req, res) => {
+  try {
+      const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+
+      // Find the daily attendance document for today
+      const dailyAttendance = await DailyAttendance.findOne({ date: today });
+
+      if (!dailyAttendance) {
+          return res.status(404).send({ message: 'No attendance found for today' });
+      }
+
+      // Return the list of employees and their check-in times
+      res.status(200).json(dailyAttendance);
+  } catch (error) {
+      console.error('Error fetching daily attendance:', error);
+      res.status(500).send({ error: 'Error fetching daily attendance data', details: error });
+  }
+});
+
 
 module.exports = router;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom"; // Import NavLink for routing
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useNavigate } from "react-router-dom";
 
 function PayrollForm() {
   const navigate = useNavigate();
@@ -79,14 +79,24 @@ function PayrollForm() {
 
   return (
     <div className="p-4">
+      <div className="flex flex-col justify-between items-center mb-6 lg:flex-row">
       <h1 className="text-2xl font-bold mb-4">Payroll Records</h1>
+      <div className="mt-4 text-center">
+      <NavLink
+        to="/payroll/generate"  // Route to generate payroll page
+        className="bg-blue-600 text-white font-semibold hover:bg-blue-700 rounded-md py-2 px-4 transition-colors duration-300"
+      >
+        Generate Payroll
+      </NavLink>
+    </div>
+      </div>
 
       {/* Filter Bar */}
-      <div className="mb-4 items-center">
+      <div className="flex flex-col justify-between items-center mb-4 lg:flex-row">
         <input
           type="text"
           placeholder="Filter by Employee Name"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2"
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
           value={filterEmployee}
           onChange={(e) => setFilterEmployee(e.target.value)}
           onKeyDown={handleKeyDown}  // Trigger search on Enter key press
@@ -94,7 +104,7 @@ function PayrollForm() {
         <input
           type="number"
           placeholder="Month"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2"
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
           value={filterMonth}
           onChange={(e) => setFilterMonth(e.target.value)}
           onKeyDown={handleKeyDown}  // Trigger search on Enter key press
@@ -102,7 +112,7 @@ function PayrollForm() {
         <input
           type="number"
           placeholder="Year"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mb-2"
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mb-2 max-w-[200px]"
           value={filterYear}
           onChange={(e) => setFilterYear(e.target.value)}
           onKeyDown={handleKeyDown}  // Trigger search on Enter key press
@@ -179,6 +189,9 @@ function PayrollForm() {
           </div>
         </div>
       )}
+
+      {/* Generate Payroll NavLink */}
+  
     </div>
   );
 }

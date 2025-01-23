@@ -43,7 +43,7 @@ const GeneratePayroll = () => {
       console.log('Payroll generated successfully:', response.data);
 
       // Optionally, you can reset the form or show a success message here
-      navigate('/payrolls');
+      navigate('/payroll');
     } catch (error) {
       console.error('Error generating payroll:', error);
       alert('Error generating payroll. Please try again.');
