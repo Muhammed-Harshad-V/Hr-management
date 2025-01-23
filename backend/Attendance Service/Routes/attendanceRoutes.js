@@ -165,7 +165,7 @@ router.get('/attendance', auth, async (req, res) => {
 
 
 // Route to get the number of check-ins for today
-router.get('/attendance/check-in-count', auth, async (req, res) => {
+router.get('/attendance/checkInCount', auth, async (req, res) => {
     try {
         const date = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
         const dailyAttendance = await DailyAttendance.findOne({ date });

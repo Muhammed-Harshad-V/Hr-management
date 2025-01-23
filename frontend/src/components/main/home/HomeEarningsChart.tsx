@@ -112,7 +112,7 @@ function HomeEarningsChart() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-md rounded-md p-4 w-full h-[300px]">
+    <div className="bg-white dark:bg-gray-800 shadow-md rounded-md p-4 w-full h-[320px]">
       {loading ? (
         <p className="text-center text-blue-500">Loading chart...</p>
       ) : (

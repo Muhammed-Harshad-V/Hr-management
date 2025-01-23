@@ -6,19 +6,25 @@ function HomeCount() {
     const [checkInCount, setCheckInCount] = useState(0);
 
     // Fetch data from the server
-    const fetchCounts = async () => {
+    const CheckInCount = async () => {
         try {
-            console.log('Fetching employee count...');
-            const employeeResponse = await APIClientPrivate.get('/employeeService/employees/count');
-            console.log('Employee count response:', employeeResponse);
-            const checkInResponse = await APIClientPrivate.get('/attendanceService/attendance/check-in-count'); // Endpoint for today's check-ins
-            console.log(employeeResponse)
+            const checkInResponse = await APIClientPrivate.get('/attendanceService/attendance/checkInCount');
             console.log(checkInResponse)
-            setEmployeeCount(employeeResponse.data.totalEmployees || 0);
             setCheckInCount(checkInResponse.data.checkInCount || 0);
         } catch (error) {
             console.error('Error fetching counts:', error);
         }
+    };
+
+    const EmployeeCount = async () => {
+        try {
+        const employeeResponse = await APIClientPrivate.get('/employeeService/employees/count');
+        console.log(employeeResponse)
+        setEmployeeCount(employeeResponse.data.totalEmployees || 0);
+    } catch (error) {
+        console.error('Error fetching counts:', error);
+    }
+
     };
 
     // Setup SSE listener
@@ -30,7 +36,7 @@ function HomeCount() {
 
             // Listen for the 'newCheckIn' event
             eventSource.onmessage = () => {
-                fetchCounts(); // Refetch counts on new check-in
+                CheckInCount(); // Refetch counts on new check-in
             };
 
         // Cleanup SSE connection on component unmount
@@ -41,7 +47,8 @@ function HomeCount() {
 
     // Fetch counts on mount and setup SSE
     useEffect(() => {
-        fetchCounts();
+        CheckInCount();
+        EmployeeCount();
         const cleanupSSE = setupSSE();
         return cleanupSSE; // Cleanup function
     }, []);
