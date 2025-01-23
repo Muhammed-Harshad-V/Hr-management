@@ -1,21 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import APIClientPrivate from '@/api/axios';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  ChartOptions,
-  ChartData,
-  Chart
-} from 'chart.js';
-
-// Register chart.js components for line chart
-ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend);
+import { Bar } from 'react-chartjs-2'; // Use the Bar chart from react-chartjs-2
+import 'chart.js/auto'; // Automatically imports necessary components from Chart.js
 
 interface EmployeeData {
   employee_name: string;
@@ -25,13 +11,12 @@ interface EmployeeData {
 function HomeEarningsChart() {
   const [employeeData, setEmployeeData] = useState<EmployeeData[]>([]);
   const [loading, setLoading] = useState(true);
-  const chartRef = useRef<Chart<'line'> | null>(null); // Ensure chartRef is specifically for "line" chart type
+  const chartRef = useRef<Chart<'bar'> | null>(null); // Ensure we're using a "bar" chart type
 
   // Fetch payroll records for all employees
   const fetchEmployeeEarnings = async () => {
     try {
-      // Fetch payroll data
-      const response = await APIClientPrivate.get('/payrollService/payroll'); // Modify with correct endpoint
+      const response = await APIClientPrivate.get('/payrollService/payroll'); // Correct your endpoint here
       const payrollData = response.data || [];
 
       // Aggregate earnings by employee_id
@@ -62,42 +47,40 @@ function HomeEarningsChart() {
     }
   };
 
-  // UseEffect hook to fetch data on component mount and cleanup chart instance on unmount
+  // Fetch employee earnings data when component mounts
   useEffect(() => {
     fetchEmployeeEarnings();
 
-    // Cleanup chart instance on unmount or before re-rendering the chart
     return () => {
       if (chartRef.current) {
-        chartRef.current.destroy(); // Destroy the previous chart instance
-        chartRef.current = null; // Clear the reference
+        chartRef.current.destroy(); // Cleanup chart on unmount
+        chartRef.current = null;
       }
     };
   }, []);
 
-  // Prepare data for the line chart
-  const chartData: ChartData<'line'> = {
-    labels: employeeData.map((employee) => employee.employee_name),
+  // Prepare data for the row (horizontal) chart
+  const chartData = {
+    labels: employeeData.map((employee) => employee.employee_name), // Employee names as y-axis labels
     datasets: [
       {
         label: "Total Earnings",
-        data: employeeData.map((employee) => employee.totalEarnings), // Total earnings for each employee
-        fill: false, // Set fill to false to make it a line chart without fill
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)', // Line color
-        borderWidth: 2, // Line width
-        tension: 0.3, // Smooth the line
+        data: employeeData.map((employee) => employee.totalEarnings), // Earnings data for each employee
+        backgroundColor: 'rgba(75, 192, 192, 0.6)', // Bar color
+        borderColor: 'rgba(75, 192, 192, 1)', // Bar border color
+        borderWidth: 1, // Bar border width
       },
     ],
   };
 
-  // Chart options for styling, updated to fit the expected type
-  const chartOptions: ChartOptions<'line'> = {
+  // Chart options to customize appearance and behavior for a horizontal chart
+  const chartOptions = {
     responsive: true,
-    maintainAspectRatio: false, // Allow chart to resize according to container
+    maintainAspectRatio: false, // Allows chart to resize with container
+    indexAxis: 'y', // Set index axis to 'y' to create a horizontal bar chart (row chart)
     plugins: {
       legend: {
-        position: 'top', // Ensure legend position is one of the valid string values
+        position: 'bottom', // Position the legend on top
       },
       title: {
         display: true,
@@ -109,34 +92,32 @@ function HomeEarningsChart() {
     },
     scales: {
       x: {
+        beginAtZero: true, // Start the x-axis from 0
         ticks: {
-          autoSkip: true, // Automatically skip labels if they are too many
+          callback: (value: number) => `$${value.toFixed(2)}`, // Format x-axis labels as currency
+        },
+      },
+      y: {
+        ticks: {
+          autoSkip: false, // Automatically skip y-axis labels if there are too many
           font: {
-            size: 12, // Adjust font size for better visibility on mobile
+            size: 12, // Adjust font size for better visibility
           },
         },
         grid: {
-          display: false,
-        },
-        display: window.innerWidth >= 1024 ? true : false, // Conditional display based on window width
-      },
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: (value: number) => `$${value.toFixed(2)}`, // Format y-axis as currency
+          display: false, // Hide grid lines for a cleaner look
         },
       },
     },
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-md rounded-md p-4 w-full h-[250px]">
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Employee Earnings</h2>
+    <div className="bg-white dark:bg-gray-800 shadow-md rounded-md p-4 w-full h-[300px]">
       {loading ? (
         <p className="text-center text-blue-500">Loading chart...</p>
       ) : (
         <div style={{ height: '100%' }}>
-          <Line ref={chartRef} data={chartData} options={chartOptions} />
+          <Bar ref={chartRef} data={chartData} options={chartOptions} /> {/* Use the Bar component for row chart */}
         </div>
       )}
     </div>
