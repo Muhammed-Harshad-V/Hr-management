@@ -23,13 +23,35 @@ function TodayCheckIn() {
     }
   };
 
+  // Setup SSE listener
+  const setupSSE = () => {
+    const eventSource = new EventSource('http://localhost:3000/attendanceService/attendance/events', {
+        withCredentials: true,  // This ensures credentials (like cookies) are sent with the request
+      });
+      
+
+        // Listen for the 'newCheckIn' event
+        eventSource.onmessage = () => {
+          fetchCheckInData(); // Refetch counts on new check-in
+        };
+
+    // Cleanup SSE connection on component unmount
+    return () => {
+        eventSource.close();
+    };
+};
+
+
   // Fetch check-ins on component mount
   useEffect(() => {
     fetchCheckInData();
+    const cleanupSSE = setupSSE();
+    return cleanupSSE; // Cleanup function
   }, []);
 
+
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 max-w-[280px] rounded-md">
+    <div className="p-4 bg-white dark:bg-gray-800 max-w-[280px] rounded-md shadow-md max-h-[400px] overflow-x-auto">
       <h1 className="text-2xl font-bold mb-4">Today's Check-Ins</h1>
 
       {loading ? (

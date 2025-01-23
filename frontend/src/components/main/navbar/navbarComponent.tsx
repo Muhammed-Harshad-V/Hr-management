@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom"; // Use NavLink instead of Link
 import ThemeToggle from "../themeToggle/ThemeToggle";
 
 const NavbaeComponent = () => {
@@ -24,7 +24,6 @@ const NavbaeComponent = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-   
 
   const autoclose = () => {
       if (window.innerWidth < 1024) {
@@ -51,45 +50,111 @@ const NavbaeComponent = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <div
-          className={`bg-white dark:bg-black text-black dark:text-white w-64 flex-shrink-0 overflow-hidden z-50 ${
+          className={`bg-white dark:bg-black text-black dark:text-white w-64 flex-shrink-0 overflow-hidden h-[calc(100vh-64px)] absolute lg:relative z-50 ${
             isSidebarOpen ? "block" : "hidden"
           }`}
         >
           <nav className="flex flex-col space-y-2 p-4">
-            <Link
+            <NavLink
               to="/"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
               onClick={() => autoclose()} // Close sidebar on click
+              end
+              // Apply styles when the link is active
+          style={({ isActive }) => {
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                return {
+                  backgroundColor: isActive
+                    ? isDarkMode
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 1)'
+                    : '',
+                  color: isActive
+                    ? 'white'
+                    : isDarkMode
+                    ? 'white'  // Lighter color for text in dark mode when not active
+                    : 'black', // Black text for light mode when not active
+                };
+              }}
             >
               Dashboard
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/employees"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
               onClick={() => autoclose()}
+              end
+              style={({ isActive }) => {
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                return {
+                  backgroundColor: isActive
+                    ? isDarkMode
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 1)'
+                    : '',
+                  color: isActive
+                    ? 'white'
+                    : isDarkMode
+                    ? 'white'  // Lighter color for text in dark mode when not active
+                    : 'black', // Black text for light mode when not active
+                };
+              }}
             >
               Employees
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/attendance"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
               onClick={() => autoclose()}
+              end
+              style={({ isActive }) => {
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                return {
+                  backgroundColor: isActive
+                    ? isDarkMode
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 1)'
+                    : '',
+                  color: isActive
+                    ? 'white'
+                    : isDarkMode
+                    ? 'white'  // Lighter color for text in dark mode when not active
+                    : 'black', // Black text for light mode when not active
+                };
+              }}
             >
               Attendance
-            </Link>
-            <Link
+            </NavLink>
+
+            <NavLink
               to="/payroll"
               className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
               onClick={() => autoclose()}
+              end
+              style={({ isActive }) => {
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                return {
+                  backgroundColor: isActive
+                    ? isDarkMode
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 1)'
+                    : '',
+                  color: isActive
+                    ? 'white'
+                    : isDarkMode
+                    ? 'white'  // Lighter color for text in dark mode when not active
+                    : 'black', // Black text for light mode when not active
+                };
+              }}
             >
               Payroll
-            </Link>
+            </NavLink>
           </nav>
         </div>
 
         {/* Main Content */}
         <main className="flex-1 bg-gray-100 p-4 overflow-y-auto dark:bg-less-black dark:text-gray-300">
-          <Outlet/>
+          <Outlet />
         </main>
       </div>
     </div>

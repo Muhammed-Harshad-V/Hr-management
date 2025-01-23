@@ -3,7 +3,8 @@ const Attendance = require('../model/attendance'); // Adjust the path as necessa
 const router = express.Router();
 const auth = require('../middleware/auth')
 const DailyAttendance = require('../model/DailyAttendance'); // New schema for daily attendance
-const eventEmitter = require('events');
+const EventEmitter = require('events');
+const eventEmitter = new EventEmitter(); // Initialize a new EventEmitter instance
 const { default: mongoose } = require('mongoose');
 
 
@@ -71,6 +72,25 @@ router.post('/attendance/check-in', async (req, res) => {
     res.status(500).send({ error: 'Error while checking in', details: error });
   }
 });
+
+// SSE Endpoint
+router.get('/attendance/events', auth, (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const onNewCheckIn = (data) => {
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    };
+
+    eventEmitter.on('newCheckIn', onNewCheckIn);
+
+    // Remove listener when the client disconnects
+    req.on('close', () => {
+        eventEmitter.removeListener('newCheckIn', onNewCheckIn);
+    });
+});
+
 
 // Check-out route (update check-out time)
 router.post('/attendance/check-out', async (req, res) => {
@@ -143,23 +163,6 @@ router.get('/attendance', auth, async (req, res) => {
   }
 });
 
-// SSE Endpoint
-router.get('/attendance/events', auth, (req, res) => {
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
-    const onNewCheckIn = (data) => {
-        res.write(`New Check-in\n\n`); // Send the event data to the frontend
-    };
-
-    eventEmitter.on('newCheckIn', onNewCheckIn);
-
-    // Remove listener when the client disconnects
-    req.on('close', () => {
-        eventEmitter.removeListener('newCheckIn', onNewCheckIn);
-    });
-});
 
 // Route to get the number of check-ins for today
 router.get('/attendance/check-in-count', auth, async (req, res) => {

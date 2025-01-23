@@ -23,12 +23,15 @@ function HomeCount() {
 
     // Setup SSE listener
     const setupSSE = () => {
-        const eventSource = new EventSource('/attendanceService/attendance/events');
+        const eventSource = new EventSource('http://localhost:3000/attendanceService/attendance/events', {
+            withCredentials: true,  // This ensures credentials (like cookies) are sent with the request
+          });
+          
 
-        eventSource.onmessage = () => {
-            console.log('New check-in detected, refetching counts...');
-            fetchCounts(); // Refetch counts on new check-in
-        };
+            // Listen for the 'newCheckIn' event
+            eventSource.onmessage = () => {
+                fetchCounts(); // Refetch counts on new check-in
+            };
 
         // Cleanup SSE connection on component unmount
         return () => {
