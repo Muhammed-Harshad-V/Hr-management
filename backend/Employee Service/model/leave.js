@@ -5,12 +5,10 @@ const leaveSchema = new mongoose.Schema(
   {
     employeeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Employee', // Reference to the Employee model
       required: true,
     },
-    leaveType: {
+    employeeName: {
       type: String,
-      enum: ['sick', 'vacation', 'personal', 'unpaid'],
       required: true,
     },
     startDate: {

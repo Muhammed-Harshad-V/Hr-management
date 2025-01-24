@@ -9,7 +9,6 @@ function HomeCount() {
     const CheckInCount = async () => {
         try {
             const checkInResponse = await APIClientPrivate.get('/attendanceService/attendance/checkInCount');
-            console.log(checkInResponse)
             setCheckInCount(checkInResponse.data.checkInCount || 0);
         } catch (error) {
             console.error('Error fetching counts:', error);
@@ -19,7 +18,6 @@ function HomeCount() {
     const EmployeeCount = async () => {
         try {
         const employeeResponse = await APIClientPrivate.get('/employeeService/employees/count');
-        console.log(employeeResponse)
         setEmployeeCount(employeeResponse.data.totalEmployees || 0);
     } catch (error) {
         console.error('Error fetching counts:', error);

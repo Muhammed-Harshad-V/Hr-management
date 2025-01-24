@@ -51,7 +51,7 @@ function TodayCheckIn() {
 
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 max-w-[280px] rounded-md shadow-md max-h-[400px] overflow-x-auto">
+    <div className="p-4 bg-white dark:bg-gray-800 max-w-[300px] min-w-[300px] rounded-md shadow-md max-h-[400px] overflow-x-auto mb-6">
       <h1 className="text-2xl font-bold mb-4">Today's Check-Ins</h1>
 
       {loading ? (
@@ -59,8 +59,8 @@ function TodayCheckIn() {
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : (
-        <div className="bg-white dark:bg-gray-800 relative overflow-x-auto rounded-md max-w-[300px]">
-          <Table className="w-full border rounded-md">
+        <div className="bg-white dark:bg-gray-800 relative overflow-x-auto rounded-md">
+          <Table className="border rounded-md">
             <TableHeader>
               <TableRow>
                 <TableHead>Employee</TableHead>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useNavigate } from "react-router-dom";
 
 function AttendanceComponent() {
   const [attendanceData, setAttendanceData] = useState([]);

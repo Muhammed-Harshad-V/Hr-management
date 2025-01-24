@@ -10,7 +10,7 @@ router.post('/leaveRequests/:userId', async (req, res) => {
     try {
         // Get the employeeId from URL parameter
         const { userId } = req.params;
-        const { leaveType, startDate, endDate, reason } = req.body;
+        const { startDate, endDate, reason, employeeName } = req.body;
 
         // Validate if the employee exists
         const employee = await Employee.findById(userId);  // Using userId from URL
@@ -21,7 +21,7 @@ router.post('/leaveRequests/:userId', async (req, res) => {
         // Create a new leave request
         const leaveRequest = new LeaveRequest({
             employeeId: userId,  // Store the employeeId in the leave request
-            leaveType,
+            employeeName,
             startDate, 
             endDate,
             reason,
@@ -29,16 +29,6 @@ router.post('/leaveRequests/:userId', async (req, res) => {
 
         // Save the leave request to the database
         const savedRequest = await leaveRequest.save();
-
-        // Create a new SSE connection to notify the frontend
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        res.flushHeaders(); // Ensure headers are sent before sending the data
-
-        // Send the SSE event with a simple text message
-        res.write(`event: leaveRequest\n`);
-        res.write(`data: New leave request submitted\n\n`);
 
         // Respond with the saved leave request
         res.status(201).json(savedRequest);
@@ -73,16 +63,6 @@ router.put('/leaveRequests/:id', auth, async (req, res) => {
         leaveRequest.status = status;
         const updatedRequest = await leaveRequest.save();
 
-        // Create an SSE connection to notify the frontend
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        res.flushHeaders(); // Ensure headers are sent before sending the data
-
-        // Send the SSE event with an appropriate message
-        res.write(`event: leaveRequestStatusUpdated\n`);
-        res.write(`data: Leave request ${status}: ${leaveRequest.employeeId} - ${leaveRequest.leaveType}\n\n`);
-
         // Respond with the updated leave request
         res.status(200).json(updatedRequest);
 
@@ -112,28 +92,8 @@ router.get('/leaveRequests/status/overview', async (req, res) => {
             return res.status(404).json({ message: 'No leave requests found in the specified date range' });
         }
 
-        // Initialize counters for approved, rejected, and pending
-        let approvedCount = 0;
-        let rejectedCount = 0;
-        let pendingCount = 0;
-
-        // Loop through the leave requests and count each status
-        leaveRequests.forEach(request => {
-            if (request.status === 'approved') {
-                approvedCount++;
-            } else if (request.status === 'rejected') {
-                rejectedCount++;
-            } else if (request.status === 'pending') {
-                pendingCount++;
-            }
-        });
-
         // Send the total counts back in the response
-        res.status(200).json({
-            totalApproved: approvedCount,
-            totalRejected: rejectedCount,
-            totalPending: pendingCount,
-        });
+        res.status(200).json(leaveRequests);
     } catch (err) {
         console.error("Error fetching leave requests overview:", err);
         res.status(500).json({ message: err.message });
