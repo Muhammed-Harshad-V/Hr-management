@@ -1,23 +1,34 @@
 import { useState, useEffect } from "react";
-import { NavLink, Outlet } from "react-router-dom"; // Use NavLink instead of Link
+import { NavLink, Outlet, useNavigate } from "react-router-dom"; // Use NavLink for routing
 import ThemeToggle from "../themeToggle/ThemeToggle";
+import APIClientPrivate from "@/api/axios"; // Assume this is your API client for making requests
 
-const NavbaeComponent = () => {
+const NavbarComponent = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const navigate = useNavigate();
 
   // Check window size on resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) {
         setIsSidebarOpen(false); // Close sidebar if window width is less than 1024px
+      } else {
+        setIsSidebarOpen(true);
       }
-      else {
-        setIsSidebarOpen(true); 
-      }
+    };
+
+    // Check login status from localStorage on component mount
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem("login");
+      setIsLoggedIn(!!token);
     };
 
     // Add event listener for resize
     window.addEventListener("resize", handleResize);
+
+    // Check login status when component mounts
+    checkLoginStatus();
 
     // Cleanup event listener on component unmount
     return () => {
@@ -26,15 +37,29 @@ const NavbaeComponent = () => {
   }, []);
 
   const autoclose = () => {
-      if (window.innerWidth < 1024) {
-        setIsSidebarOpen(false);
-      }
-  }
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Send logout API request to backend (if necessary)
+      await APIClientPrivate.get("employeeService//logout"); // Replace with your actual logout endpoint
+
+      // Remove token from localStorage and update login status
+      localStorage.removeItem("token");
+      setIsLoggedIn(false);
+      navigate("/login"); // Redirect to login page after logout
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col text-black dark:text-white">
       {/* Top Navbar */}
-      <header className=" text-black dark:text-white px-4 py-3 flex justify-between items-center bg-white dark:bg-black">
+      <header className="text-black dark:text-white px-4 py-3 flex justify-between items-center bg-white dark:bg-black">
         <h1 className="text-lg font-bold">Admin Panel</h1>
         <div className="flex flex-row">
           <button
@@ -54,101 +79,69 @@ const NavbaeComponent = () => {
             isSidebarOpen ? "block" : "hidden"
           }`}
         >
-          <nav className="flex flex-col space-y-2 p-4">
-            <NavLink
-              to="/"
-              className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-              onClick={() => autoclose()} // Close sidebar on click
-              end
-              // Apply styles when the link is active
-          style={({ isActive }) => {
-                const isDarkMode = document.documentElement.classList.contains('dark');
-                return {
-                  backgroundColor: isActive
-                    ? isDarkMode
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 1)'
-                    : '',
-                  color: isActive
-                    ? 'white'
-                    : isDarkMode
-                    ? 'white'  // Lighter color for text in dark mode when not active
-                    : 'black', // Black text for light mode when not active
-                };
-              }}
-            >
-              Dashboard
-            </NavLink>
-            <NavLink
-              to="/employees"
-              className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-              onClick={() => autoclose()}
-              end
-              style={({ isActive }) => {
-                const isDarkMode = document.documentElement.classList.contains('dark');
-                return {
-                  backgroundColor: isActive
-                    ? isDarkMode
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 1)'
-                    : '',
-                  color: isActive
-                    ? 'white'
-                    : isDarkMode
-                    ? 'white'  // Lighter color for text in dark mode when not active
-                    : 'black', // Black text for light mode when not active
-                };
-              }}
-            >
-              Employees
-            </NavLink>
-            <NavLink
-              to="/attendance"
-              className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-              onClick={() => autoclose()}
-              end
-              style={({ isActive }) => {
-                const isDarkMode = document.documentElement.classList.contains('dark');
-                return {
-                  backgroundColor: isActive
-                    ? isDarkMode
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 1)'
-                    : '',
-                  color: isActive
-                    ? 'white'
-                    : isDarkMode
-                    ? 'white'  // Lighter color for text in dark mode when not active
-                    : 'black', // Black text for light mode when not active
-                };
-              }}
-            >
-              Attendance
-            </NavLink>
+          <nav className="flex flex-col justify-between h-full p-4">
+            {/* Top navigation links */}
+            <div className="flex flex-col">
+              <NavLink
+                to="/"
+                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
+                onClick={() => autoclose()} // Close sidebar on click
+                end
+              >
+                Dashboard
+              </NavLink>
+              <NavLink
+                to="/employees"
+                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
+                onClick={() => autoclose()}
+                end
+              >
+                Employees
+              </NavLink>
+              <NavLink
+                to="/attendance"
+                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
+                onClick={() => autoclose()}
+                end
+              >
+                Attendance
+              </NavLink>
+              <NavLink
+                to="/payroll"
+                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
+                onClick={() => autoclose()}
+                end
+              >
+                Payroll
+              </NavLink>
+              <NavLink
+                to="/leaveRequests"
+                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
+                onClick={() => autoclose()}
+                end
+              >
+                Leave Requests
+              </NavLink>
+            </div>
 
-            <NavLink
-              to="/payroll"
-              className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-              onClick={() => autoclose()}
-              end
-              style={({ isActive }) => {
-                const isDarkMode = document.documentElement.classList.contains('dark');
-                return {
-                  backgroundColor: isActive
-                    ? isDarkMode
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 1)'
-                    : '',
-                  color: isActive
-                    ? 'white'
-                    : isDarkMode
-                    ? 'white'  // Lighter color for text in dark mode when not active
-                    : 'black', // Black text for light mode when not active
-                };
-              }}
-            >
-              Payroll
-            </NavLink>
+            {/* Bottom section with login/logout button */}
+            <div className="mt-auto">
+              {isLoggedIn ? (
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 w-full"
+                >
+                  Logout
+                </button>
+              ) : (
+                <NavLink
+                  to="/login"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-full"
+                >
+                  Login
+                </NavLink>
+              )}
+            </div>
           </nav>
         </div>
 
@@ -161,4 +154,4 @@ const NavbaeComponent = () => {
   );
 };
 
-export default NavbaeComponent;
+export default NavbarComponent;

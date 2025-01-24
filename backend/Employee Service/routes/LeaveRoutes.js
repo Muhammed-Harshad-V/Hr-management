@@ -73,32 +73,36 @@ router.put('/leaveRequests/:id', auth, async (req, res) => {
 
 
   // all leave request
-router.get('/leaveRequests/status/overview', async (req, res) => {
+  router.get('/leaveRequests/status/overview', async (req, res) => {
     try {
-        const { startDate, endDate } = req.query; // Get start and end dates from query parameters
+        const { status, startDate, endDate } = req.query;
 
-        // Prepare the date range filter if provided
-        const filter = {};
+        // Build filter object based on status and date range (if provided)
+        let filter = {};
 
-        if (startDate && endDate) {
-            filter.startDate = { $gte: new Date(startDate) }; // start date greater than or equal to
-            filter.endDate = { $lte: new Date(endDate) }; // end date less than or equal to
+        if (status) {
+            filter.status = status; // Add status filter if provided
         }
 
-        // Fetch leave requests based on date range
+        if (startDate && endDate) {
+            filter.startDate = { $gte: new Date(startDate), $lte: new Date(endDate) }; // Filter by date range if provided
+        }
+
+        // Fetch leave requests based on filter
         const leaveRequests = await LeaveRequest.find(filter);
 
         if (!leaveRequests || leaveRequests.length === 0) {
-            return res.status(404).json({ message: 'No leave requests found in the specified date range' });
+            return res.status(404).json({ message: 'No leave requests found' });
         }
 
-        // Send the total counts back in the response
+        // Send the leave requests back in the response
         res.status(200).json(leaveRequests);
     } catch (err) {
         console.error("Error fetching leave requests overview:", err);
         res.status(500).json({ message: err.message });
     }
 });
+
 
 
 

@@ -5,10 +5,11 @@ import Login from "./page/login/Login";
 import Employees from "./page/Employees/Employees";
 import AddEmployee from "./components/main/employees/addEmployee/AddEmployee";
 import EditEmployee from "./components/main/employees/editEmployee/EditEmployee";
-import Attendance from "./page/attendance/attendance";
+import Attendance from "./page/attendance/Attendance";
 import GeneratePayroll from "./components/main/payroll/PayrollGenerate/PayrollGenerate";
 import Payroll from "./page/payroll/payroll";
 import PayrollEdit from "./components/main/payroll/PayrollEdit/PayrollEdit";
+import Leave from "./page/Leave/Leave";
 
 function App() {
   const router = createBrowserRouter([
@@ -51,6 +52,10 @@ function App() {
           {
             path: "/payroll/edit/:id",
             element: <PayrollEdit/>
+          },
+          {
+            path: "/leaveRequests",
+            element: <Leave/>
           },
         ]
     },
