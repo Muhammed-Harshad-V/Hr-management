@@ -61,23 +61,23 @@ function AttendanceComponent() {
       <h1 className="text-2xl font-bold mb-4">Attendance Records</h1>
 
       {/* Filter Bar */}
-      <div className="mb-4 items-center">
+      <div className="flex flex-col justify-between items-center mb-4 lg:flex-row">
         <input
           type="date"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2"
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
           value={filterStartDate}
           onChange={(e) => setFilterStartDate(e.target.value)}
         />
         <input
           type="date"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2"
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
           value={filterEndDate}
           onChange={(e) => setFilterEndDate(e.target.value)}
         />
         <input
           type="text"
           placeholder="Filter by Name"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md"
+          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md max-w-[200px]"
           value={filterEmployee}
           onChange={(e) => setFilterEmployee(e.target.value)}
           onKeyDown={handleEmployeeSearchKeyDown}  // Trigger search on Enter key press
