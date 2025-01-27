@@ -12,9 +12,9 @@ app.use(cors({
   }));
   
 
-app.use('/employeeService' , http('http://localhost:3001'));
-app.use('/attendanceService' , http('http://localhost:3002'));
-app.use('/payrollService' , http('http://localhost:3003'));
+app.use('/employeeService' , http('https://hr-management-employee-service.onrender.com'));
+app.use('/attendanceService' , http('https://hr-management-attendance-service.onrender.com'));
+app.use('/payrollService' , http('https://hr-management-payroll-service.onrender.com'));
 
 app.listen(3000, () => {
     console.log('gateway service is running on 3000')
