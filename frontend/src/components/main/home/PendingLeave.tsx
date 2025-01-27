@@ -3,10 +3,20 @@ import { NavLink } from "react-router-dom"; // Import NavLink from react-router-
 import APIClientPrivate from "@/api/axios"; // Assuming this is where you handle API requests
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+// Define TypeScript types for leave request
+interface LeaveRequest {
+  id: string; // or number depending on your backend structure
+  employeeName: string;
+  reason: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+}
+
 function PendingLeave() {
-  const [leaveRequests, setLeaveRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]); // Explicitly typing the state as an array of LeaveRequest
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
   // Fetch pending leave requests within the date range
   const fetchLeaveRequests = async () => {
@@ -14,14 +24,16 @@ function PendingLeave() {
       setLoading(true);
       const response = await APIClientPrivate.get(`/employeeService/leaveRequests/status/overview`);
       console.log(response);
-      
+
       if (Array.isArray(response.data)) {
-        const pendingRequests = response.data.filter(request => request.status === 'pending'); // Filter pending requests
+        const pendingRequests = response.data.filter(
+          (request: LeaveRequest) => request.status === 'pending'
+        ); // Filter pending requests
         setLeaveRequests(pendingRequests);
       } else {
         setError("Unexpected response format.");
       }
-      
+
       setError(""); // Reset error on successful response
     } catch (err) {
       setError("No pending leave requests found.");
@@ -58,13 +70,13 @@ function PendingLeave() {
               <TableBody>
                 {leaveRequests.length > 0 ? (
                   leaveRequests.map((request) => (
-                    <TableRow key={request.id || request.employeeName}> {/* Use unique key */}
+                    <TableRow key={request.id}>
                       <TableCell>{request.employeeName}</TableCell>
                       <TableCell>{request.reason}</TableCell>
                       <TableCell>
                         {Math.ceil(
-                          (new Date(request.endDate) - new Date(request.startDate)) / (1000 * 3600 * 24)
-                        )} {/* Calculate days */}
+                          (new Date(request.endDate).getTime() - new Date(request.startDate).getTime()) / (1000 * 3600 * 24)
+                        )}
                       </TableCell>
                     </TableRow>
                   ))

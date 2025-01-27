@@ -1,31 +1,42 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { NavLink, useNavigate } from "react-router-dom"; // Import NavLink for routing
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-function PayrollForm() {
+// Define types for payroll data
+interface Payroll {
+  _id: string;
+  employee_name: string;
+  month: number;
+  year: number;
+  gross_salary: number;
+  net_salary: number;
+  status: string;
+}
+
+const PayrollForm = () => {
   const navigate = useNavigate();
-  const [payrollData, setPayrollData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [filterMonth, setFilterMonth] = useState("");
-  const [filterYear, setFilterYear] = useState("");
-  const [filterEmployee, setFilterEmployee] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [payrollData, setPayrollData] = useState<Payroll[]>([]); // Type state as an array of Payroll objects
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>(""); // Type error state as string
+  const [filterMonth, setFilterMonth] = useState<string>(""); // Filter month type as string
+  const [filterYear, setFilterYear] = useState<string>(""); // Filter year type as string
+  const [filterEmployee, setFilterEmployee] = useState<string>(""); // Filter employee type as string
+  const [currentPage, setCurrentPage] = useState<number>(1); // Current page type as number
+  const [itemsPerPage] = useState<number>(10); // Items per page type as number
 
   // Fetch payroll data based on filters
   const fetchPayroll = async () => {
     try {
       setLoading(true);
-      const params = {};
+      const params: { [key: string]: string } = {}; // Declare params as an object with string keys
       if (filterMonth) params.month = filterMonth;
       if (filterYear) params.year = filterYear;
       if (filterEmployee) params.employee_name = filterEmployee;
 
       const response = await APIClientPrivate.get("payrollService/payroll", { params });
-      setPayrollData(response.data || []);
-      setError("");
+      setPayrollData(response.data || []); // Type response.data correctly
+      setError(""); // Clear any previous error
     } catch (err) {
       setError("Failed to load payroll. Please try again later.");
       console.log(err);
@@ -40,7 +51,7 @@ function PayrollForm() {
   }, []); // Initial fetch without any filters
 
   // Handle page change
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
@@ -50,19 +61,19 @@ function PayrollForm() {
   const currentPayroll = payrollData.slice(indexOfFirstRecord, indexOfLastRecord);
 
   // Trigger search on Enter key press
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       fetchPayroll(); // Trigger the fetch when Enter is pressed
     }
   };
 
   // Function to format salary to integer (removes decimal part)
-  const formatSalary = (salary) => {
+  const formatSalary = (salary: number) => {
     return Math.floor(salary); // Removes the decimal part
   };
 
   // Function to get the color class for the status
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "text-yellow-500"; // Yellow for pending
@@ -80,15 +91,15 @@ function PayrollForm() {
   return (
     <div className="p-4">
       <div className="flex flex-col justify-between items-center mb-6 lg:flex-row">
-      <h1 className="text-2xl font-bold mb-4">Payroll Records</h1>
-      <div className="mt-4 text-center">
-      <NavLink
-        to="/payroll/generate"  // Route to generate payroll page
-        className="bg-blue-600 text-white font-semibold hover:bg-blue-700 rounded-md py-2 px-4 transition-colors duration-300"
-      >
-        Generate Payroll
-      </NavLink>
-    </div>
+        <h1 className="text-2xl font-bold mb-4">Payroll Records</h1>
+        <div className="mt-4 text-center">
+          <NavLink
+            to="/payroll/generate" // Route to generate payroll page
+            className="bg-blue-600 text-white font-semibold hover:bg-blue-700 rounded-md py-2 px-4 transition-colors duration-300"
+          >
+            Generate Payroll
+          </NavLink>
+        </div>
       </div>
 
       {/* Filter Bar */}
@@ -98,24 +109,24 @@ function PayrollForm() {
           placeholder="Filter by Employee Name"
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
           value={filterEmployee}
-          onChange={(e) => setFilterEmployee(e.target.value)}
-          onKeyDown={handleKeyDown}  // Trigger search on Enter key press
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterEmployee(e.target.value)}
+          onKeyDown={handleKeyDown} // Trigger search on Enter key press
         />
         <input
           type="number"
           placeholder="Month"
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
           value={filterMonth}
-          onChange={(e) => setFilterMonth(e.target.value)}
-          onKeyDown={handleKeyDown}  // Trigger search on Enter key press
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterMonth(e.target.value)}
+          onKeyDown={handleKeyDown} // Trigger search on Enter key press
         />
         <input
           type="number"
           placeholder="Year"
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mb-2 max-w-[200px]"
           value={filterYear}
-          onChange={(e) => setFilterYear(e.target.value)}
-          onKeyDown={handleKeyDown}  // Trigger search on Enter key press
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterYear(e.target.value)}
+          onKeyDown={handleKeyDown} // Trigger search on Enter key press
         />
       </div>
 
@@ -191,9 +202,8 @@ function PayrollForm() {
       )}
 
       {/* Generate Payroll NavLink */}
-  
     </div>
   );
-}
+};
 
 export default PayrollForm;

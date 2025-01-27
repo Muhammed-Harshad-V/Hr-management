@@ -1,24 +1,36 @@
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom"; // Import NavLink for routing
 import APIClientPrivate from "@/api/axios"; // API call
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // Table components
 
-function LeaveForm() {
-  const [leaveRequests, setLeaveRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [statusFilter, setStatusFilter] = useState(""); // New state for filtering by status
+// Type definitions for leave requests
+interface LeaveRequest {
+  _id: string;
+  employeeName: string;
+  reason: string;
+  startDate: string;
+  endDate: string;
+  status: "pending" | "approved" | "rejected";
+}
 
-  // Fetch all leave requests with optional date filter and status filter
+function LeaveForm() {
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]); // State for leave requests
+  const [loading, setLoading] = useState<boolean>(true); // State for loading
+  const [error, setError] = useState<string>(""); // State for error
+  const [statusFilter, setStatusFilter] = useState<string>(""); // State for filter by status
+
+  // Fetch all leave requests with optional status filter
   const fetchLeaveRequests = async () => {
     try {
       setLoading(true);
-      const params = {};
-      if (statusFilter) params.status = statusFilter; // Add status filter to params
-
+      const params = statusFilter ? { status: statusFilter } : {}; // Add status filter if needed
       const response = await APIClientPrivate.get("/employeeService/leaveRequests/status/overview", { params });
-      setLeaveRequests(response.data);
-      setError(""); // Reset error on success
+
+      if (response.data && Array.isArray(response.data)) {
+        setLeaveRequests(response.data);
+        setError(""); // Reset error on successful response
+      } else {
+        setError("Unexpected response format.");
+      }
     } catch (err) {
       setError("Failed to load leave requests.");
       console.error(err);
@@ -27,15 +39,17 @@ function LeaveForm() {
     }
   };
 
+  // Re-fetch leave requests when status filter changes
   useEffect(() => {
     fetchLeaveRequests();
-  }, [statusFilter]); // Re-fetch data when date filters or status filter change
+  }, [statusFilter]);
 
-  const handleChangeStatus = async (id, newStatus) => {
+  // Function to update status of a leave request
+  const handleChangeStatus = async (id: string, newStatus: "approved" | "rejected") => {
     try {
-      const response = await APIClientPrivate.put(`employeeService/leaveRequests/${id}`, { status: newStatus });
+      const response = await APIClientPrivate.put(`/employeeService/leaveRequests/${id}`, { status: newStatus });
       if (response.data) {
-        // Update the status in the local state after success
+        // Update the status locally
         setLeaveRequests(prevRequests =>
           prevRequests.map(request =>
             request._id === id ? { ...request, status: newStatus } : request
@@ -47,8 +61,8 @@ function LeaveForm() {
     }
   };
 
-  // Function to get status color class
-  const getStatusColor = (status) => {
+  // Function to determine status color class
+  const getStatusColor = (status: "pending" | "approved" | "rejected"): string => {
     switch (status) {
       case "pending":
         return "text-yellow-500"; // Yellow for pending
@@ -57,7 +71,7 @@ function LeaveForm() {
       case "rejected":
         return "text-red-500"; // Red for rejected
       default:
-        return "text-gray-500"; // Default gray if status is unknown
+        return "text-gray-500"; // Default gray for unknown statuses
     }
   };
 
@@ -65,10 +79,9 @@ function LeaveForm() {
     <div className="p-4 w-full max-h-[400px] overflow-x-auto">
       <h1 className="text-2xl font-bold mb-4">All Leave Requests</h1>
 
-      {/* Date Range and Status Filters */}
+      {/* Status Filter */}
       <div className="flex justify-between mb-4">
         <div className="flex gap-4">
-          {/* Status Filter Dropdown */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -107,9 +120,7 @@ function LeaveForm() {
                     <TableCell>{request.reason}</TableCell>
                     <TableCell>{new Date(request.startDate).toLocaleDateString()}</TableCell>
                     <TableCell>{new Date(request.endDate).toLocaleDateString()}</TableCell>
-                    <TableCell className={getStatusColor(request.status)}>
-                      {request.status}
-                    </TableCell>
+                    <TableCell className={getStatusColor(request.status)}>{request.status}</TableCell>
                     <TableCell>
                       {request.status === "pending" && (
                         <>

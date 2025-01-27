@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom"; // Import NavLink from react-router-dom
-import APIClientPrivate from "@/api/axios";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { NavLink } from "react-router-dom"; // Import NavLink for routing
+import APIClientPrivate from "@/api/axios"; // API call
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // Table components
+
+// Define types for the check-in data
+interface CheckInData {
+  name: string;
+  checkInTime: string;
+}
 
 function TodayCheckIn() {
-  const [checkInData, setCheckInData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [checkInData, setCheckInData] = useState<CheckInData[]>([]); // State for check-ins
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [error, setError] = useState<string>(""); // Error message state
 
   // Fetch today's check-ins data from the server
   const fetchCheckInData = async () => {
@@ -14,41 +20,38 @@ function TodayCheckIn() {
       setLoading(true);
       const response = await APIClientPrivate.get("/attendanceService/attendance/daily"); // Endpoint for today's check-ins
       setCheckInData(response.data.employees || []); // Update the state with check-ins data
-      setError("");
+      setError(""); // Clear any previous errors
     } catch (err) {
       setError("Failed to load today's check-ins. Please try again later.");
       console.error(err);
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading state to false once the API call finishes
     }
   };
 
-  // Setup SSE listener
+  // Setup SSE listener to receive real-time updates for new check-ins
   const setupSSE = () => {
     const eventSource = new EventSource('http://localhost:3000/attendanceService/attendance/events', {
-        withCredentials: true,  // This ensures credentials (like cookies) are sent with the request
-      });
-      
+      withCredentials: true,  // This ensures credentials (like cookies) are sent with the request
+    });
 
-        // Listen for the 'newCheckIn' event
-        eventSource.onmessage = () => {
-          fetchCheckInData(); // Refetch counts on new check-in
-        };
-
-    // Cleanup SSE connection on component unmount
-    return () => {
-        eventSource.close();
+    // Listen for the 'newCheckIn' event to trigger the refetch of check-in data
+    eventSource.onmessage = () => {
+      fetchCheckInData(); // Refetch check-ins when a new check-in occurs
     };
-};
 
+    // Return a cleanup function that closes the SSE connection when the component unmounts
+    return () => {
+      eventSource.close();
+    };
+  };
 
-  // Fetch check-ins on component mount
+  // Fetch check-ins on component mount and setup SSE listener
   useEffect(() => {
-    fetchCheckInData();
-    const cleanupSSE = setupSSE();
-    return cleanupSSE; // Cleanup function
-  }, []);
-
+    fetchCheckInData(); // Fetch initial check-in data
+    const cleanupSSE = setupSSE(); // Set up SSE for real-time updates
+    return cleanupSSE; // Cleanup function for SSE on unmount
+  }, []); // Empty dependency array means this effect runs once on mount
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 max-w-[300px] min-w-[300px] rounded-md shadow-md max-h-[400px] overflow-x-auto mb-6">
@@ -101,4 +104,3 @@ function TodayCheckIn() {
 }
 
 export default TodayCheckIn;
-

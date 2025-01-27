@@ -2,21 +2,31 @@ import { useState, useEffect } from "react";
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+// TypeScript type for attendance record
+interface Attendance {
+  _id: string;
+  employee_name: string;
+  date: string;
+  check_in_time: string;
+  check_out_time: string | null;
+  worked_hours: number;
+}
+
 function AttendanceComponent() {
-  const [attendanceData, setAttendanceData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [filterStartDate, setFilterStartDate] = useState(""); // Start date of the range
-  const [filterEndDate, setFilterEndDate] = useState(""); // End date of the range
-  const [filterEmployee, setFilterEmployee] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Adjust the number of records per page
+  const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);  // Use Attendance type
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [filterStartDate, setFilterStartDate] = useState<string>(""); // Start date of the range
+  const [filterEndDate, setFilterEndDate] = useState<string>(""); // End date of the range
+  const [filterEmployee, setFilterEmployee] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(10); // Adjust the number of records per page
   
   // Fetch attendance data based on filters (date range or specific employee)
   const fetchAttendance = async () => {
     try {
       setLoading(true);
-      const params = {};
+      const params: { [key: string]: string } = {};  // Define params type
       if (filterStartDate && filterEndDate) {
         params.start_date = filterStartDate;
         params.end_date = filterEndDate;
@@ -26,9 +36,9 @@ function AttendanceComponent() {
       const response = await APIClientPrivate.get("/attendanceService/attendance", { params });
       setAttendanceData(response.data || []);
       setError("");
-    } catch (err) {
+    } catch (err: any) {
       setError("Failed to load attendance. Please try again later.");
-      console.log(err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -36,10 +46,10 @@ function AttendanceComponent() {
 
   useEffect(() => {
     fetchAttendance();
-  }, [filterStartDate, filterEndDate]);
+  }, [filterStartDate, filterEndDate, filterEmployee]);
 
   // Handle page change
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
@@ -49,7 +59,7 @@ function AttendanceComponent() {
   const currentAttendance = attendanceData.slice(indexOfFirstRecord, indexOfLastRecord);
 
   // Trigger search only when Enter key is pressed in the employee name input
-  const handleEmployeeSearchKeyDown = (e) => {
+  const handleEmployeeSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       fetchAttendance(); // Trigger the search when Enter is pressed
     }

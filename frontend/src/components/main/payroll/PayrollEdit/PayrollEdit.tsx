@@ -4,10 +4,20 @@ import * as Yup from "yup";
 import APIClientPrivate from "@/api/axios";
 import { useNavigate, useParams } from "react-router-dom";
 
+// Define TypeScript interface for payroll data
+interface PayrollData {
+  employee_name: string;
+  month: string;
+  year: string;
+  gross_salary: number;
+  net_salary: number;
+  status: string;
+}
+
 const PayrollEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams(); // Get the payroll ID from the URL
-  const [payrollData, setPayrollData] = useState(null);
+  const [payrollData, setPayrollData] = useState<PayrollData | null>(null);
 
   // Fetch payroll data by ID
   const fetchPayrollData = async () => {
@@ -21,7 +31,9 @@ const PayrollEdit = () => {
   };
 
   useEffect(() => {
-    fetchPayrollData();
+    if (id) {
+      fetchPayrollData();
+    }
   }, [id]);
 
   // Validation schema using Yup (only validating the status)
@@ -30,7 +42,7 @@ const PayrollEdit = () => {
   });
 
   // Handle form submission
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: PayrollData) => {
     try {
       await APIClientPrivate.put(`/payrollService/payroll/${id}`, values);
       navigate('/payroll'); // Redirect to the payroll list after successful update
@@ -40,6 +52,7 @@ const PayrollEdit = () => {
     }
   };
 
+  // Check if payroll data is available
   if (!payrollData) {
     return <p>Loading...</p>; // Display loading until payroll data is fetched
   }
@@ -52,8 +65,8 @@ const PayrollEdit = () => {
           employee_name: payrollData.employee_name || '',
           month: payrollData.month || '',
           year: payrollData.year || '',
-          gross_salary: payrollData.gross_salary || '',
-          net_salary: payrollData.net_salary || '',
+          gross_salary: payrollData.gross_salary || 0,
+          net_salary: payrollData.net_salary || 0,
           status: payrollData.status || '',
         }}
         validationSchema={validationSchema}

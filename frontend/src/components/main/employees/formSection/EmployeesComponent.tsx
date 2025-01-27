@@ -1,20 +1,30 @@
 import { useState, useEffect } from "react";
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link, Navigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
+// Define types for Employee data
+interface Employee {
+  _id: string;
+  name: string;
+  email: string;
+  position: string;
+  department: string;
+  salary: string;
+  status: "active" | "inactive"; // Adjust this based on actual status values
+  hireDate: string;
+}
 
 function EmployeesComponent() {
   const navigate = useNavigate();
-  const [employees, setEmployees] = useState([]);
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // You can adjust the page size here
-  
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(5); // You can adjust the page size here
+
   // Fetch employees from the backend
   const fetchEmployees = async () => {
     try {
@@ -53,7 +63,7 @@ function EmployeesComponent() {
   }, [searchTerm, employees]);
 
   // Handle page change
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
@@ -62,16 +72,16 @@ function EmployeesComponent() {
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
   const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
 
-  const handleEditEmployee = (id) => {
-    navigate(`update/${id}`)
+  const handleEditEmployee = (id: string) => {
+    navigate(`/update/${id}`);
   };
 
-  const  handleDeleteEmployee = async (id) => {
+  const handleDeleteEmployee = async (id: string) => {
     try {
       await APIClientPrivate.delete(`/employeeService/employees/${id}`);
-      fetchEmployees()
+      fetchEmployees();
     } catch (err) {
-      setError("Failed to Remove Employee. please try agin later.");
+      setError("Failed to Remove Employee. Please try again later.");
     }
   };
 

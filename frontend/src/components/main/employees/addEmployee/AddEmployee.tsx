@@ -1,10 +1,22 @@
-import { Field, Form, Formik } from 'formik';
+import { Field, Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import APIClientPrivate from '@/api/axios';
-import {useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+// Define types for form values
+interface FormValues {
+  name: string;
+  email: string;
+  position: string;
+  department: string;
+  salary: string;
+  password: string;
+  hireDate: string; // If hireDate is required as string for API
+}
 
 const AddEmployee = () => {
   const navigate = useNavigate();
+
   // Validation schema using Yup
   const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
@@ -13,20 +25,22 @@ const AddEmployee = () => {
     department: Yup.string().required('Department is required'),
     salary: Yup.number().required('Salary is required').min(0, 'Salary must be a positive number'),
     password: Yup.string().required('Password is required'),
-    hireDate: Yup.date(), // Added hire date validation
+    hireDate: Yup.date(), // If needed, can add specific validation for hire date
   });
 
   // Handle form submission
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: FormValues, actions: FormikHelpers<FormValues>) => {
     try {
-      // Send the form data to the backend API (update the URL accordingly)
+      // Send the form data to the backend API
       const response = await APIClientPrivate.post('/employeeService/employees', values);
       console.log('Employee created successfully:', response.data);
 
       // Optionally, you can reset the form or show a success message here
-      navigate('/employees');
+      actions.setSubmitting(false); // Stop submitting
+      navigate('/employees'); // Navigate to employees page after successful submission
     } catch (error) {
       console.error('Error creating employee:', error);
+      actions.setSubmitting(false); // Stop submitting in case of error
       alert('Error creating employee. Please try again.');
     }
   };
@@ -42,12 +56,12 @@ const AddEmployee = () => {
           department: '',
           salary: '',
           password: '',
-          hireDate: '', // Added hireDate field to the form
+          hireDate: '', // Hire date field initialized as empty string
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit} // Pass the handleSubmit function to Formik
       >
-        {({ touched, errors }) => (
+        {({ touched, errors, isSubmitting }) => (
           <Form className="w-full max-w-lg bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
             {/* Name field */}
             <div className="form-field mb-6">
@@ -136,8 +150,9 @@ const AddEmployee = () => {
             <button
               type="submit"
               className="w-full bg-indigo-600 text-white p-4 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:focus:ring-indigo-400"
+              disabled={isSubmitting} // Disable button while submitting
             >
-              Add Employee
+              {isSubmitting ? 'Submitting...' : 'Add Employee'}
             </button>
           </Form>
         )}

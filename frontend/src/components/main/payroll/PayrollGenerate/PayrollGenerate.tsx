@@ -38,17 +38,14 @@ const GeneratePayroll = () => {
   // Handle form submission
   const handleSubmit = async (values: FormValues, { setSubmitting }: FormikHelpers<FormValues>) => {
     try {
-      // Send the form data to the backend API (update the URL accordingly)
       const response = await APIClientPrivate.post('/payrollService/payroll/generate', values);
       console.log('Payroll generated successfully:', response.data);
-
-      // Optionally, you can reset the form or show a success message here
       navigate('/payroll');
     } catch (error) {
       console.error('Error generating payroll:', error);
       alert('Error generating payroll. Please try again.');
     } finally {
-      setSubmitting(false); // Stop the submitting spinner when the form is done submitting
+      setSubmitting(false);
     }
   };
 
@@ -67,9 +64,9 @@ const GeneratePayroll = () => {
           bonus: 200,
         }}
         validationSchema={validationSchema}
-        onSubmit={handleSubmit} // Pass the handleSubmit function to Formik
+        onSubmit={handleSubmit}
       >
-        {({ values, touched, errors, setFieldValue }) => (
+        {({ values, touched, errors }) => (
           <Form className="w-full max-w-lg bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
             {/* Month field */}
             <div className="form-field mb-6">
@@ -127,16 +124,16 @@ const GeneratePayroll = () => {
                 render={arrayHelpers => (
                   <div>
                     {values.deductions && values.deductions.length > 0 ? (
-                      values.deductions.map((deduction, index) => (
+                      values.deductions.map((_deduction, index) => (
                         <div key={index} className="flex space-x-4 mb-4">
                           <div className="w-1/2">
                             <Field
                               name={`deductions[${index}].type`}
                               className="w-full p-4 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-indigo-400"
                               placeholder="Deduction Type"
-                            />
-                            {touched.deductions?.[index]?.type && errors.deductions?.[index]?.type && (
-                              <div className="text-red-500 text-sm mt-2">{errors.deductions[index].type}</div>
+                            />  
+                            {touched.deductions?.[index]?.type && (errors.deductions as any)?.[index]?.type && (
+                              <div className="text-red-500 text-sm mt-2">{(errors.deductions as any)[index]?.type}</div>
                             )}
                           </div>
                           <div className="w-1/2">
@@ -146,13 +143,13 @@ const GeneratePayroll = () => {
                               className="w-full p-4 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:focus:ring-indigo-400"
                               placeholder="Amount"
                             />
-                            {touched.deductions?.[index]?.amount && errors.deductions?.[index]?.amount && (
-                              <div className="text-red-500 text-sm mt-2">{errors.deductions[index].amount}</div>
+                            {touched.deductions?.[index]?.amount && (errors.deductions as any)?.[index]?.amount && (
+                              <div className="text-red-500 text-sm mt-2">{(errors.deductions as any)[index]?.amount}</div>
                             )}
                           </div>
                           <button
                             type="button"
-                            onClick={() => arrayHelpers.remove(index)}  // remove deduction
+                            onClick={() => arrayHelpers.remove(index)}
                             className="text-red-500 mt-4"
                           >
                             Remove
@@ -162,7 +159,7 @@ const GeneratePayroll = () => {
                     ) : null}
                     <button
                       type="button"
-                      onClick={() => arrayHelpers.push({ type: '', amount: 0 })}  // Add new deduction
+                      onClick={() => arrayHelpers.push({ type: '', amount: 0 })}
                       className="text-indigo-600 mt-4"
                     >
                       Add Deduction

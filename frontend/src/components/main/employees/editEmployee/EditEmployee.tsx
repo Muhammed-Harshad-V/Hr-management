@@ -1,13 +1,33 @@
-import { Field, Form, Formik } from 'formik';
+import { Field, Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import APIClientPrivate from '@/api/axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+// Define types for form values
+interface EmployeeFormValues {
+  name: string;
+  position: string;
+  department: string;
+  salary: string; // Assuming salary is passed as string to API
+  hireDate: string;
+  status: string;
+}
+
+// Define the response type for employee data (based on the structure from your API)
+interface EmployeeData {
+  name: string;
+  position: string;
+  department: string;
+  salary: string;
+  hireDate: string;
+  status: string;
+}
+
 const EditEmployee = () => {
   const navigate = useNavigate();
   const { id } = useParams(); // Get the employee ID from the URL
-  const [employeeData, setEmployeeData] = useState(null);
+  const [employeeData, setEmployeeData] = useState<EmployeeData | null>(null);
 
   // Fetch employee data by ID
   const fetchEmployeeData = async () => {
@@ -35,15 +55,16 @@ const EditEmployee = () => {
   });
 
   // Handle form submission
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: EmployeeFormValues, actions: FormikHelpers<EmployeeFormValues>) => {
     try {
-      // Send the form data to the backend API to update employee
+      // Send the form data to the backend API to update the employee
       await APIClientPrivate.put(`/employeeService/employees/${id}`, values);
       // Navigate back to the employee list
       navigate('/employees');
     } catch (error) {
       console.error('Error updating employee:', error);
       alert('Error updating employee. Please try again.');
+      actions.setSubmitting(false); // Stop submitting after error
     }
   };
 
@@ -66,7 +87,7 @@ const EditEmployee = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit} // Pass the handleSubmit function to Formik
       >
-        {({ touched, errors }) => (
+        {({ touched, errors, isSubmitting }) => (
           <Form className="w-full max-w-lg bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
             {/* Name field */}
             <div className="form-field mb-6">
@@ -143,8 +164,9 @@ const EditEmployee = () => {
             <button
               type="submit"
               className="w-full bg-indigo-600 text-white p-4 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:focus:ring-indigo-400"
+              disabled={isSubmitting} // Disable the button while submitting
             >
-              Update Employee
+              {isSubmitting ? 'Updating...' : 'Update Employee'}
             </button>
           </Form>
         )}

@@ -1,8 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import APIClientPrivate from '@/api/axios';
 import { Bar } from 'react-chartjs-2'; // Use the Bar chart from react-chartjs-2
 import 'chart.js/auto'; // Automatically imports necessary components from Chart.js
+import { ChartOptions, Chart } from 'chart.js'; // Import types for chart.js
 
+// Define types for API response
+interface PayrollRecord {
+  employee_id: string;
+  employee_name: string;
+  net_salary: number;
+  bonuses: number;
+}
+
+// Define types for chart data
 interface EmployeeData {
   employee_name: string;
   totalEarnings: number;
@@ -10,19 +20,19 @@ interface EmployeeData {
 
 function HomeEarningsChart() {
   const [employeeData, setEmployeeData] = useState<EmployeeData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const chartRef = useRef<Chart<'bar'> | null>(null); // Ensure we're using a "bar" chart type
 
   // Fetch payroll records for all employees
   const fetchEmployeeEarnings = async () => {
     try {
-      const response = await APIClientPrivate.get('/payrollService/payroll'); // Correct your endpoint here
+      const response = await APIClientPrivate.get<PayrollRecord[]>('/payrollService/payroll'); // Correct your endpoint here
       const payrollData = response.data || [];
 
       // Aggregate earnings by employee_id
       const earningsMap: { [key: string]: EmployeeData } = {};
 
-      payrollData.forEach((record: any) => {
+      payrollData.forEach((record) => {
         const employeeId = record.employee_id; // Use employee_id as key
         const earnings = (record.net_salary || 0) + (record.bonuses || 0); // Calculate total earnings
 
@@ -74,7 +84,7 @@ function HomeEarningsChart() {
   };
 
   // Chart options to customize appearance and behavior for a horizontal chart
-  const chartOptions = {
+  const chartOptions: ChartOptions<'bar'> = { // Correct the type here by specifying 'bar' chart type
     responsive: true,
     maintainAspectRatio: false, // Allows chart to resize with container
     indexAxis: 'y', // Set index axis to 'y' to create a horizontal bar chart (row chart)
@@ -94,7 +104,8 @@ function HomeEarningsChart() {
       x: {
         beginAtZero: true, // Start the x-axis from 0
         ticks: {
-          callback: (value: number) => `$${value.toFixed(2)}`, // Format x-axis labels as currency
+          // Fix: Accept both string and number for value in the callback
+          callback: (value: string | number) => `$${(typeof value === 'number' ? value : parseFloat(value)).toFixed(2)}`, // Format x-axis labels as currency
         },
       },
       y: {
