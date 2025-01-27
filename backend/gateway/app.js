@@ -5,7 +5,7 @@ const cors = require('cors')
 
 // Allow credentials and specify allowed origin
 app.use(cors({
-    origin: 'https://hr-management-7ut0.onrender.com/', // Your frontend's URL
+    origin: 'https://hr-management-7ut0.onrender.com', // Your frontend's URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)
