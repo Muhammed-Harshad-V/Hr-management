@@ -14,7 +14,7 @@ const port = process.env.PORT || 3001;
 
 // Allow credentials and specify allowed origin
 app.use(cors({
-    origin: 'http://localhost:5173', // Your frontend's URL
+    origin: 'https://hr-management-7ut0.onrender.com/', // Your frontend's URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)
