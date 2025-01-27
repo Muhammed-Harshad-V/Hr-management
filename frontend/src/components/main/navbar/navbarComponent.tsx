@@ -48,7 +48,7 @@ const NavbarComponent = () => {
       await APIClientPrivate.get("employeeService//logout"); // Replace with your actual logout endpoint
 
       // Remove token from localStorage and update login status
-      localStorage.removeItem("token");
+      localStorage.removeItem("login");
       setIsLoggedIn(false);
       navigate("/login"); // Redirect to login page after logout
     } catch (error) {

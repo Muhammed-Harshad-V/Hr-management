@@ -10,61 +10,96 @@ import GeneratePayroll from "./components/main/payroll/PayrollGenerate/PayrollGe
 import Payroll from "./page/payroll/payroll";
 import PayrollEdit from "./components/main/payroll/PayrollEdit/PayrollEdit";
 import Leave from "./page/Leave/Leave";
+import ProtectedRoute from "./protection/ProtectedRoute";  // Import the ProtectedRoute
 
 function App() {
   const router = createBrowserRouter([
     {
-        path: "/",
-        element: <Navbar/>,
-        children: [
-          {
-            path: "/",
-            element: <Home/>,
-          },
-          {
-            path: "/login",
-            element: <Login/>
-          },
-          {
-            path: "/employees",
-            element: <Employees/>
-          },
-          {
-            path: "/employees/add/employee",
-            element: <AddEmployee/>
-          },
-          {
-            path: "/employees/update/:id",
-            element: <EditEmployee/>
-          },
-          {
-            path: "/attendance",
-            element: <Attendance/>
-          },
-          {
-            path: "/payroll/generate",
-            element: <GeneratePayroll/>
-          },
-          {
-            path: "/payroll",
-            element: <Payroll/>
-          },
-          {
-            path: "/payroll/edit/:id",
-            element: <PayrollEdit/>
-          },
-          {
-            path: "/leaveRequests",
-            element: <Leave/>
-          },
-        ]
+      path: "/",
+      element: <Navbar />,  // The Navbar remains accessible
+      children: [
+        {
+          path: "/",
+          element:(
+            <ProtectedRoute>
+            <Home />,
+            </ProtectedRoute>
+          ) 
+            
+        },
+        {
+          path: "/login",
+          element: <Login />,  // No protection for the login page
+        },
+        {
+          path: "/employees",
+          element: (
+            <ProtectedRoute>
+              <Employees />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/employees/add/employee",
+          element: (
+            <ProtectedRoute>
+              <AddEmployee />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/employees/update/:id",
+          element: (
+            <ProtectedRoute>
+              <EditEmployee />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/attendance",
+          element: (
+            <ProtectedRoute>
+              <Attendance />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/payroll/generate",
+          element: (
+            <ProtectedRoute>
+              <GeneratePayroll />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/payroll",
+          element: (
+            <ProtectedRoute>
+              <Payroll />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/payroll/edit/:id",
+          element: (
+            <ProtectedRoute>
+              <PayrollEdit />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/leaveRequests",
+          element: (
+            <ProtectedRoute>
+              <Leave />
+            </ProtectedRoute>
+          ),
+        },
+      ],
     },
- 
   ]);
 
-  return (
-    <RouterProvider router={router} />
-  );
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
