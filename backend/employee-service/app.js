@@ -28,7 +28,8 @@ app.use('/', LogRoutes)
 
 
 // MongoDB connection
-const dbURI = process.env.MURL;
+const dbURI = process.env.MURL 
+// || "mongodb://localhost:27017/employee-service";
 mongoose.connect(dbURI)
     .then(() => console.log('MongoDB connected...'))
     .catch(err => console.log(err));

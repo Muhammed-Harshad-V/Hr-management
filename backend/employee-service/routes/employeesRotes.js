@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 
 // Get all employees
 router.get('/employees', auth, async (req, res) => {
+  console.log(req.headers)
     try {
         const employees = await Employee.find();
         res.json(employees);

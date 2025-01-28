@@ -1,7 +1,6 @@
 const express = require('express');
 const Employee = require('../model/employee'); // Adjust the path as necessary
 const router = express.Router();
-const auth = require('../middleware/auth')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 

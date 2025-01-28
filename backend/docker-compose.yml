@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: ./gateway/
+      dockerfile: Dockerfile.gateway
+    ports:
+      - "3000:3000"  # Expose the gateway on port 3000
+    depends_on:
+      - attendance-service
+      - employee-service
+      - payroll-service
+      - mongo  # Ensures the gateway starts after other services
+    networks:
+      - microservice-network
+    environment:
+      - ATTENDANCE_SERVICE_URL=http://attendance-service:3002
+      - EMPLOYEE_SERVICE_URL=http://employee-service:3001
+      - PAYROLL_SERVICE_URL=http://payroll-service:3003
+      - MONGO_URI=mongodb://mongo:27017/mydb
+
+  attendance-service:
+    build:
+      context: ./attendance-service/
+      dockerfile: Dockerfile.attendance
+    environment:
+      - MURL=mongodb://mongo:27017/attendanceDB  # Using a dedicated DB
+      - JWT_SECRET=qwertyuiopasdfghjklzxcvbnm
+    depends_on:
+      - mongo
+    networks:
+      - microservice-network
+
+  employee-service:
+    build:
+      context: ./employee-service/
+      dockerfile: Dockerfile.employee
+    environment:
+      - MURL=mongodb://mongo:27017/employeeDB  # Using a dedicated DB
+      - JWT_SECRET=qwertyuiopasdfghjklzxcvbnm
+    depends_on:
+      - mongo
+    networks:
+      - microservice-network
+
+  payroll-service:
+    build:
+      context: ./payroll-service/
+      dockerfile: Dockerfile.payroll
+    environment:
+      - MURL=mongodb://mongo:27017/payrollDB  # Using a dedicated DB
+      - JWT_SECRET=qwertyuiopasdfghjklzxcvbnm
+    depends_on:
+      - mongo
+    networks:
+      - microservice-network
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongodb_data:/data/db  # Persist MongoDB data to a volume
+    ports:
+      - "27017:27017"  # Expose MongoDB on the default port for internal and external access
+    networks:
+      - microservice-network
+
+volumes:
+  mongodb_data:  # This will persist MongoDB data
+
+networks:
+  microservice-network:
+    driver: bridge  # This specifies the default network driver for inter-container communication

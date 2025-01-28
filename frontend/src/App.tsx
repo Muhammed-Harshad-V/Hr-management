@@ -19,20 +19,19 @@ function App() {
       element: <Navbar />,  // The Navbar remains accessible
       children: [
         {
-          path: "/dashboard",
-          element:(
+          path: "/dashboard",  // Path for the Dashboard Home page
+          element: (
             <ProtectedRoute>
-            <Home />,
+              <Home />
             </ProtectedRoute>
-          ) 
-            
+          ),
         },
         {
-          path: "dashboard/login",
-          element: <Login />,  // No protection for the login page
+          path: "/dashboard/login",  // Path for the login page
+          element: <Login />,
         },
         {
-          path: "dashboard/employees",
+          path: "/dashboard/employees",  // Path for the Employees page
           element: (
             <ProtectedRoute>
               <Employees />
@@ -40,7 +39,7 @@ function App() {
           ),
         },
         {
-          path: "employees/add/employee",
+          path: "/dashboard/employees/add/employee",  // Path for adding an employee
           element: (
             <ProtectedRoute>
               <AddEmployee />
@@ -48,7 +47,7 @@ function App() {
           ),
         },
         {
-          path: "employees/update/:id",
+          path: "/dashboard/employees/update/:id",  // Path for editing an employee
           element: (
             <ProtectedRoute>
               <EditEmployee />
@@ -56,7 +55,7 @@ function App() {
           ),
         },
         {
-          path: "attendance",
+          path: "/dashboard/attendance",  // Path for the Attendance page
           element: (
             <ProtectedRoute>
               <Attendance />
@@ -64,7 +63,7 @@ function App() {
           ),
         },
         {
-          path: "payroll/generate",
+          path: "/dashboard/payroll/generate",  // Path for generating payroll
           element: (
             <ProtectedRoute>
               <GeneratePayroll />
@@ -72,7 +71,7 @@ function App() {
           ),
         },
         {
-          path: "payroll",
+          path: "/dashboard/payroll",  // Path for the Payroll page
           element: (
             <ProtectedRoute>
               <Payroll />
@@ -80,7 +79,7 @@ function App() {
           ),
         },
         {
-          path: "payroll/edit/:id",
+          path: "/dashboard/payroll/edit/:id",  // Path for editing payroll
           element: (
             <ProtectedRoute>
               <PayrollEdit />
@@ -88,7 +87,7 @@ function App() {
           ),
         },
         {
-          path: "leaveRequests",
+          path: "/dashboard/leaveRequests",  // Path for leave requests
           element: (
             <ProtectedRoute>
               <Leave />

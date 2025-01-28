@@ -24,7 +24,8 @@ app.use('/', payroll)
 
 
 // MongoDB connection
-const dbURI = process.env.MURL;
+const dbURI = process.env.MURL 
+// || "mongodb://localhost:27017/payroll-service";
 mongoose.connect(dbURI)
     .then(() => console.log('MongoDB connected...'))
     .catch(err => console.log(err));
