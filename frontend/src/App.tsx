@@ -15,11 +15,11 @@ import ProtectedRoute from "./protection/ProtectedRoute";  // Import the Protect
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: "/dashboard",
       element: <Navbar />,  // The Navbar remains accessible
       children: [
         {
-          path: "/",
+          path: "/dashboard",
           element:(
             <ProtectedRoute>
             <Home />,
@@ -28,11 +28,11 @@ function App() {
             
         },
         {
-          path: "/login",
+          path: "dashboard/login",
           element: <Login />,  // No protection for the login page
         },
         {
-          path: "/employees",
+          path: "dashboard/employees",
           element: (
             <ProtectedRoute>
               <Employees />
@@ -40,7 +40,7 @@ function App() {
           ),
         },
         {
-          path: "/employees/add/employee",
+          path: "employees/add/employee",
           element: (
             <ProtectedRoute>
               <AddEmployee />
@@ -48,7 +48,7 @@ function App() {
           ),
         },
         {
-          path: "/employees/update/:id",
+          path: "employees/update/:id",
           element: (
             <ProtectedRoute>
               <EditEmployee />
@@ -56,7 +56,7 @@ function App() {
           ),
         },
         {
-          path: "/attendance",
+          path: "attendance",
           element: (
             <ProtectedRoute>
               <Attendance />
@@ -64,7 +64,7 @@ function App() {
           ),
         },
         {
-          path: "/payroll/generate",
+          path: "payroll/generate",
           element: (
             <ProtectedRoute>
               <GeneratePayroll />
@@ -72,7 +72,7 @@ function App() {
           ),
         },
         {
-          path: "/payroll",
+          path: "payroll",
           element: (
             <ProtectedRoute>
               <Payroll />
@@ -80,7 +80,7 @@ function App() {
           ),
         },
         {
-          path: "/payroll/edit/:id",
+          path: "payroll/edit/:id",
           element: (
             <ProtectedRoute>
               <PayrollEdit />
@@ -88,7 +88,7 @@ function App() {
           ),
         },
         {
-          path: "/leaveRequests",
+          path: "leaveRequests",
           element: (
             <ProtectedRoute>
               <Leave />

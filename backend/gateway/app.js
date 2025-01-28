@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('express-http-proxy');
+const path = require('path');
 const app = express();
 const cors = require('cors');
 
@@ -14,6 +15,12 @@ app.use(cors({
     credentials: true // Allow credentials (cookies, authorization headers)
 }));
 
+// Serve static files for the dashboard
+// Use the correct relative path or absolute path for your build directory
+const buildPath = path.join(__dirname, '../../frontend/dist');
+console.log('Serving React app from:', buildPath); // Optional: to confirm the correct path
+app.use('/dashboard/*', express.static(buildPath));
+
 // Proxy routes with timeout configuration
 app.use('/employeeService', http('https://hr-management-employee-service.onrender.com', {
   timeout: TIMEOUT // Set timeout to 2 minutes for this service
@@ -24,6 +31,11 @@ app.use('/attendanceService', http('https://hr-management-attendance-service.onr
 app.use('/payrollService', http('https://hr-management-payroll-service.onrender.com', {
   timeout: TIMEOUT // Set timeout to 2 minutes for this service
 }));
+
+// Fallback route to serve the React app's index.html for non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
 
 app.listen(3000, () => {
     console.log('Gateway service is running on port 3000');
