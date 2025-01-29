@@ -94,7 +94,7 @@ const PayrollForm = () => {
         <h1 className="text-2xl font-bold mb-4">Payroll Records</h1>
         <div className="mt-4 text-center">
           <NavLink
-            to="/payroll/generate" // Route to generate payroll page
+            to="/dashboard/payroll/generate" // Route to generate payroll page
             className="bg-blue-600 text-white font-semibold hover:bg-blue-700 rounded-md py-2 px-4 transition-colors duration-300"
           >
             Generate Payroll

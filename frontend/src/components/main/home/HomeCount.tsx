@@ -27,7 +27,7 @@ function HomeCount() {
 
     // Setup SSE listener
     const setupSSE = () => {
-        const eventSource = new EventSource('https://hr-management-attendance-service.onrender.com/attendanceService/attendance/events', {
+        const eventSource = new EventSource('http://localhost:3000/attendanceService/attendance/events', {
             withCredentials: true,  // This ensures credentials (like cookies) are sent with the request
           });
           

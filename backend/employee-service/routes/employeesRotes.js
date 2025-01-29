@@ -155,17 +155,26 @@ router.delete('/employees/:id', auth, async (req, res) => {
     }
 });
 
-// Get total count of employees
-router.get('/employees/count', async (req, res) => {
-    try {
-      console.log('Fetching employee count');
-      const totalEmployees = await Employee.countDocuments();
-      console.log('Employee count fetched:', totalEmployees);
-      res.status(200).json({ totalEmployees });
-    } catch (err) {
-      console.error('Error in fetching employee count:', err);
-      res.status(500).json({ message: err.message });
-    }
-});
+// // Get total count of employees
+// router.get('/employees/count', auth,async (req, res) => {
+//   try {
+//     console.log('Fetching employee count');
+//     // const totalEmployees = await Employee.getEmployeeCount(); // This should work as long as no filter is provided
+//     console.log('Employee count fetched:', totalEmployees);
+//     res.status(200).json({ totalEmployees:[] });
+//   } catch (err) {
+//     console.error('Error in fetching employee count:', err);
+//     res.status(500).json({ message: err.message });
+//   }
+// });
+
+router.get("/employees/counteeee", auth, async (req, res) => {
+  try {
+    // const totalEmployees = await Employee.countDocuments();
+    res.status(200).json({ totalEmployees:"" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+})
 
 module.exports = router;

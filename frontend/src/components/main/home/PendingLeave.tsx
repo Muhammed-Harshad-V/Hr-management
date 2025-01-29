@@ -59,7 +59,7 @@ function PendingLeave() {
           <p className="text-center text-red-500">{error}</p>
         ) : (
           <div className="bg-white dark:bg-gray-800 relative overflow-x-auto rounded-md">
-            <Table className="w-full border rounded-md">
+            <Table className="border rounded-md">
               <TableHeader>
                 <TableRow>
                   <TableHead>Employee</TableHead>

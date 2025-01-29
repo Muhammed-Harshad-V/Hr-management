@@ -98,7 +98,15 @@ employeeSchema.methods.comparePassword = async function (providedPassword) {
 //     console.log('Hashed password:', hashedPassword);
 //   });
 // });
-
+// Static method to get employee count
+employeeSchema.statics.getEmployeeCount = async function () {
+  try {
+    const count = await this.countDocuments();
+    return count;
+  } catch (error) {
+    throw new Error('Error fetching employee count');
+  }
+};
 // Create the Employee model from the schema
 const Employee = mongoose.model('Employee', employeeSchema);
 

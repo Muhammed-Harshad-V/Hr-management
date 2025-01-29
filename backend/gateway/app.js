@@ -32,13 +32,23 @@ app.use('/dashboard/*', express.static(buildPath));
 //   timeout: TIMEOUT // Set timeout to 2 minutes for this service
 // }));
 
-app.use('/employeeService', http('http://employee-service:3001', {
+// app.use('/employeeService', http('http://employee-service:3001', {
+//   timeout: TIMEOUT
+// }));
+// app.use('/attendanceService', http('http://attendance-service:3002', {
+//   timeout: TIMEOUT
+// }));
+// app.use('/payrollService', http('http://payroll-service:3003', {
+//   timeout: TIMEOUT
+// }));
+
+app.use('/employeeService', http('http://localhost:3001', {
   timeout: TIMEOUT
 }));
-app.use('/attendanceService', http('http://attendance-service:3002', {
+app.use('/attendanceService', http('http://localhost:3002', {
   timeout: TIMEOUT
 }));
-app.use('/payrollService', http('http://payroll-service:3003', {
+app.use('/payrollService', http('http://localhost:3003', {
   timeout: TIMEOUT
 }));
 // Fallback route to serve the React app's index.html for non-API routes
