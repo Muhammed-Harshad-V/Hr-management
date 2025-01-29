@@ -45,7 +45,7 @@ const PayrollEdit = () => {
   const handleSubmit = async (values: PayrollData) => {
     try {
       await APIClientPrivate.put(`/payrollService/payroll/${id}`, values);
-      navigate('/payroll'); // Redirect to the payroll list after successful update
+      navigate('/dashboard/payroll'); // Redirect to the payroll list after successful update
     } catch (error) {
       console.error('Error updating payroll:', error);
       alert('Error updating payroll. Please try again.');

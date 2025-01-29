@@ -37,7 +37,7 @@ const AddEmployee = () => {
 
       // Optionally, you can reset the form or show a success message here
       actions.setSubmitting(false); // Stop submitting
-      navigate('/employees'); // Navigate to employees page after successful submission
+      navigate('/dashboard/employees'); // Navigate to employees page after successful submission
     } catch (error) {
       console.error('Error creating employee:', error);
       actions.setSubmitting(false); // Stop submitting in case of error

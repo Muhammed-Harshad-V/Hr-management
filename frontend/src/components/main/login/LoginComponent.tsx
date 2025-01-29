@@ -24,7 +24,7 @@ const LoginComponent = () => {
 
 
       console.log("Login successful:", response.data);
-      navigate("/");
+      navigate("/dashboard");
 
       // Redirect or perform other actions after successful login
       // Example: window.location.href = '/dashboard';

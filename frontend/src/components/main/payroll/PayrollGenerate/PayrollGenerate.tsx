@@ -40,7 +40,7 @@ const GeneratePayroll = () => {
     try {
       const response = await APIClientPrivate.post('/payrollService/payroll/generate', values);
       console.log('Payroll generated successfully:', response.data);
-      navigate('/payroll');
+      navigate('/dashboard/payroll');
     } catch (error) {
       console.error('Error generating payroll:', error);
       alert('Error generating payroll. Please try again.');

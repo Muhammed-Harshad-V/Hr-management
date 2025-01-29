@@ -60,7 +60,7 @@ const EditEmployee = () => {
       // Send the form data to the backend API to update the employee
       await APIClientPrivate.put(`/employeeService/employees/${id}`, values);
       // Navigate back to the employee list
-      navigate('/employees');
+      navigate('/dashboard/employees');
     } catch (error) {
       console.error('Error updating employee:', error);
       alert('Error updating employee. Please try again.');

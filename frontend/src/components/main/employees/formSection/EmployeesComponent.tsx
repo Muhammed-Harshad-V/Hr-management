@@ -73,7 +73,7 @@ function EmployeesComponent() {
   const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
 
   const handleEditEmployee = (id: string) => {
-    navigate(`/update/${id}`);
+    navigate(`/dashboard/update/${id}`);
   };
 
   const handleDeleteEmployee = async (id: string) => {

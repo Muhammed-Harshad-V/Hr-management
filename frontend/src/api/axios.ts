@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://hr-management-gateway.onrender.com";
+const API_URL = "http://localhost:3000";
 
 const APIClientPrivate = axios.create({
     baseURL: API_URL,

@@ -9,7 +9,7 @@ const TIMEOUT = 120000; // 120,000 ms = 2 minutes
 
 // Allow credentials and specify allowed origin
 app.use(cors({
-    origin: 'https://hr-management-7ut0.onrender.com', // Your frontend's URL
+    origin: 'http://localhost:5173', // Your frontend's URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)

@@ -162,7 +162,7 @@ const PayrollForm = () => {
                     </TableCell>
                     <TableCell>
                       <button
-                        onClick={() => navigate(`/payroll/edit/${payroll._id}`)}
+                        onClick={() => navigate(`/dashboard/payroll/edit/${payroll._id}`)}
                         className="text-blue-500 hover:text-blue-600 mr-2"
                       >
                         Edit

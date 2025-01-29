@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || 3003;
 
 app.use(cors({
-    origin: 'https://hr-management-gateway.onrender.com', // Your frontend's URL
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)

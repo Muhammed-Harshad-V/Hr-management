@@ -45,12 +45,12 @@ const NavbarComponent = () => {
   const handleLogout = async () => {
     try {
       // Send logout API request to backend (if necessary)
-      await APIClientPrivate.get("employeeService//logout"); // Replace with your actual logout endpoint
+      await APIClientPrivate.get("employeeService/logout"); // Replace with your actual logout endpoint
 
       // Remove token from localStorage and update login status
       localStorage.removeItem("login");
       setIsLoggedIn(false);
-      navigate("/login"); // Redirect to login page after logout
+      navigate("/dashboard/login"); // Redirect to login page after logout
     } catch (error) {
       console.error("Logout failed", error);
     }
@@ -83,7 +83,7 @@ const NavbarComponent = () => {
             {/* Top navigation links */}
             <div className="flex flex-col">
               <NavLink
-                to="/"
+                to="/dashboard"
                 className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
                 onClick={() => autoclose()} // Close sidebar on click
                 end
@@ -91,7 +91,7 @@ const NavbarComponent = () => {
                 Dashboard
               </NavLink>
               <NavLink
-                to="/employees"
+                to="/dashboard/employees"
                 className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
                 onClick={() => autoclose()}
                 end
@@ -99,7 +99,7 @@ const NavbarComponent = () => {
                 Employees
               </NavLink>
               <NavLink
-                to="/attendance"
+                to="/dashboard/attendance"
                 className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
                 onClick={() => autoclose()}
                 end
@@ -107,7 +107,7 @@ const NavbarComponent = () => {
                 Attendance
               </NavLink>
               <NavLink
-                to="/payroll"
+                to="/dashboard/payroll"
                 className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
                 onClick={() => autoclose()}
                 end
@@ -115,7 +115,7 @@ const NavbarComponent = () => {
                 Payroll
               </NavLink>
               <NavLink
-                to="/leaveRequests"
+                to="/dashboard/leaveRequests"
                 className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
                 onClick={() => autoclose()}
                 end
@@ -135,7 +135,7 @@ const NavbarComponent = () => {
                 </button>
               ) : (
                 <NavLink
-                  to="/login"
+                  to="/dashboard/login"
                   className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-full"
                 >
                   Login

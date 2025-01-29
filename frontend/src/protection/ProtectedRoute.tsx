@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   // If the user is an admin, render the protected children, else redirect them to the login page
-  return isAdmin ? <>{children}</> : <Navigate to="/login" />;
+  return isAdmin ? <>{children}</> : <Navigate to="/dashboard/login" />;
 };
 
 export default ProtectedRoute;
