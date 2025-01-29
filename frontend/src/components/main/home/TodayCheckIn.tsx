@@ -14,20 +14,52 @@ function TodayCheckIn() {
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [error, setError] = useState<string>(""); // Error message state
 
-  // Fetch today's check-ins data from the server
   const fetchCheckInData = async () => {
     try {
       setLoading(true);
-      const response = await APIClientPrivate.get("/attendanceService/attendance/daily"); // Endpoint for today's check-ins
-      setCheckInData(response.data.employees || []); // Update the state with check-ins data
-      setError(""); // Clear any previous errors
-    } catch (err) {
-      setError("Failed to load today's check-ins. Please try again later.");
-      console.error(err);
+      const response = await APIClientPrivate.get("/attendanceService/attendance/daily");
+  
+      // Check if the response status is OK (status code 200)
+      if (response.status === 200) {
+        setCheckInData(response.data.employees || []); // Update the state with check-ins data
+        setError(""); // Clear any previous errors
+      } else {
+        // Handle other statuses (e.g., 400, 404, 500, etc.)
+        setError(`Unexpected status code: ${response.status}. Please try again later.`);
+      }
+    } catch (err: any) {
+      // Check if it's a known error and handle accordingly
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        switch (err.response.status) {
+          case 401:
+            setError("401 Unauthorized. Please log in again.");
+            // Optionally, you can redirect the user to the login page
+            // navigate("/login");
+            break;
+          case 404:
+            setError("404 Today's check-ins not found. Please try again later.");
+            break;
+          case 500:
+            setError("500 Server error. Please try again later.");
+            break;
+          default:
+            setError(`Error ${err.response.status}: ${err.response.data.message || "Something went wrong."}`);
+        }
+      } else if (err.request) {
+        // The request was made but no response was received
+        setError("No response from the server. Please check your connection.");
+      } else {
+        // Something happened in setting up the request
+        setError(`Request failed: ${err.message}`);
+      }
+      console.error(err); // Log the error for debugging
     } finally {
       setLoading(false); // Set loading state to false once the API call finishes
     }
   };
+  
 
   // Setup SSE listener to receive real-time updates for new check-ins
   const setupSSE = () => {

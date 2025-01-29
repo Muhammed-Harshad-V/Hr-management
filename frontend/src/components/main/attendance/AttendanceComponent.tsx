@@ -74,12 +74,12 @@ function AttendanceComponent() {
 
       {/* Filter Bar */}
       <div className="flex flex-col justify-between items-center mb-4 lg:flex-row">
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 flex-col lg:flex-row items-center">
           <DatePicker
             selected={filterStartDate}
-            onChange={(date: Date) => setFilterStartDate(date)}
+            onChange={(date: Date | null) => setFilterStartDate(date)} // Handle null in onChange
             placeholderText="Start Date"
-            className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md max-w-[200px]"
+            className="p-2 border border-gray-300 dark:border-none mb-4 dark:bg-gray-800 rounded-md max-w-[200px]"
             dateFormat="yyyy-MM-dd"
             selectsStart
             startDate={filterStartDate}
@@ -87,14 +87,14 @@ function AttendanceComponent() {
           />
           <DatePicker
             selected={filterEndDate}
-            onChange={(date: Date) => setFilterEndDate(date)}
+            onChange={(date: Date | null) => setFilterEndDate(date)} // Handle null in onChange
             placeholderText="End Date"
-            className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md max-w-[200px]"
+            className="p-2 border border-gray-300 dark:border-none mb-4 dark:bg-gray-800 rounded-md max-w-[200px]"
             dateFormat="yyyy-MM-dd"
             selectsEnd
             startDate={filterStartDate}
             endDate={filterEndDate}
-            minDate={filterStartDate}  // Ensure end date is after the start date
+            minDate={filterStartDate ? filterStartDate : undefined}  // Ensure minDate is handled properly for undefined
           />
         </div>
 

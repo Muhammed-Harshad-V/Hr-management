@@ -18,28 +18,52 @@ function PendingLeave() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
-  // Fetch pending leave requests within the date range
+  // Fetch pending leave requests from the API
   const fetchLeaveRequests = async () => {
     try {
       setLoading(true);
-      const response = await APIClientPrivate.get(`/employeeService/leaveRequests/status/overview`);
-      console.log(response);
+      
+      // Call API to get leave requests; modify the endpoint to match the actual API
+      const response = await APIClientPrivate.get(`/employeeService/leaveRequests`, {
+        params: {
+          status: "pending", // Filter by pending status
+        },
+      });
 
-      if (Array.isArray(response.data)) {
+      if (response.status === 200) {
         const pendingRequests = response.data.filter(
-          (request: LeaveRequest) => request.status === 'pending'
-        ); // Filter pending requests
-        setLeaveRequests(pendingRequests);
+          (request: LeaveRequest) => request.status === "pending"
+        );
+        setLeaveRequests(pendingRequests); // Set the pending requests
+        setError(""); // Clear error message on successful fetch
       } else {
-        setError("Unexpected response format.");
+        // Handle unexpected status code
+        setError(`Unexpected status code: ${response.status}. Please try again later.`);
       }
-
-      setError(""); // Reset error on successful response
-    } catch (err) {
-      setError("No pending leave requests found.");
+    } catch (err: any) {
+      // Handle errors based on response status codes
+      if (err.response) {
+        switch (err.response.status) {
+          case 401:
+            setError("401 Unauthorized. Please log in again.");
+            break;
+          case 404:
+            setError("404 Leave requests not found.");
+            break;
+          case 500:
+            setError("500 Server error. Please try again later.");
+            break;
+          default:
+            setError(`Error: ${err.response.data.message || "Something went wrong."}`);
+        }
+      } else if (err.request) {
+        setError("No response from the server. Please check your connection.");
+      } else {
+        setError(`Request failed: ${err.message}`);
+      }
       console.error(err);
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading state to false once the API call finishes
     }
   };
 
@@ -75,7 +99,8 @@ function PendingLeave() {
                       <TableCell>{request.reason}</TableCell>
                       <TableCell>
                         {Math.ceil(
-                          (new Date(request.endDate).getTime() - new Date(request.startDate).getTime()) / (1000 * 3600 * 24)
+                          (new Date(request.endDate).getTime() - new Date(request.startDate).getTime()) /
+                            (1000 * 3600 * 24)
                         )}
                       </TableCell>
                     </TableRow>

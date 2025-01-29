@@ -8,6 +8,15 @@ const NavbarComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
   const navigate = useNavigate();
 
+  // Define the routes for the sidebar dynamically
+  const links = [
+    { name: "Dashboard", to: "/dashboard" },
+    { name: "Employees", to: "/dashboard/employees" },
+    { name: "Attendance", to: "/dashboard/attendance" },
+    { name: "Payroll", to: "/dashboard/payroll" },
+    { name: "Leave Requests", to: "/dashboard/leaveRequests" },
+  ];
+
   // Check window size on resize
   useEffect(() => {
     const handleResize = () => {
@@ -82,46 +91,32 @@ const NavbarComponent = () => {
           <nav className="flex flex-col justify-between h-full p-4">
             {/* Top navigation links */}
             <div className="flex flex-col">
-              <NavLink
-                to="/dashboard"
-                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-                onClick={() => autoclose()} // Close sidebar on click
-                end
-              >
-                Dashboard
-              </NavLink>
-              <NavLink
-                to="/dashboard/employees"
-                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-                onClick={() => autoclose()}
-                end
-              >
-                Employees
-              </NavLink>
-              <NavLink
-                to="/dashboard/attendance"
-                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-                onClick={() => autoclose()}
-                end
-              >
-                Attendance
-              </NavLink>
-              <NavLink
-                to="/dashboard/payroll"
-                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-                onClick={() => autoclose()}
-                end
-              >
-                Payroll
-              </NavLink>
-              <NavLink
-                to="/dashboard/leaveRequests"
-                className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
-                onClick={() => autoclose()}
-                end
-              >
-                Leave Requests
-              </NavLink>
+              {links.map((link, index) => (
+                <NavLink
+                  key={index}
+                  to={link.to}
+                  className="dark:hover:bg-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
+                  onClick={autoclose}
+                  end
+                  style={({ isActive }) => {
+                    const isDarkMode = document.documentElement.classList.contains('dark');
+                    return {
+                      backgroundColor: isActive
+                        ? isDarkMode
+                          ? 'rgba(255, 255, 255, 0.2)'
+                          : 'rgba(0, 0, 0, 1)'
+                        : '',
+                      color: isActive
+                        ? 'white'
+                        : isDarkMode
+                          ? 'white'  // Lighter color for text in dark mode when not active
+                          : 'black', // Black text for light mode when not active
+                    };
+                  }}
+                >
+                  {link.name}
+                </NavLink>
+              ))}
             </div>
 
             {/* Bottom section with login/logout button */}
