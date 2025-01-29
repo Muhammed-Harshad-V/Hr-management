@@ -54,7 +54,7 @@ function TodayCheckIn() {
   }, []); // Empty dependency array means this effect runs once on mount
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 max-w-[300px] min-w-[300px] rounded-md shadow-md max-h-[400px] overflow-x-auto mb-6">
+    <div className="p-4 bg-white dark:bg-gray-800 max-w-[300px] min-w-[300px] rounded-md shadow-md max-h-[400px] overflow-x-auto min-h-[200px]">
       <h1 className="text-2xl font-bold mb-4">Today's Check-Ins</h1>
 
       {loading ? (

@@ -49,7 +49,7 @@ services:
       context: ./payroll-service/
       dockerfile: Dockerfile.payroll
     environment:
-      - MURL=mongodb://mongo:27017/payrollDB  # Using a dedicated DB
+      - MURL=mongodb://mongo:27017/payrollDB
       - JWT_SECRET=qwertyuiopasdfghjklzxcvbnm
     depends_on:
       - mongo

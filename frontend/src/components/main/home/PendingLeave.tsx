@@ -49,7 +49,7 @@ function PendingLeave() {
   }, []); // Empty array to run once when component mounts
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 w-full rounded-md shadow-md max-h-[400px] overflow-x-auto">
+    <div className="p-4 bg-white dark:bg-gray-800 w-full rounded-md shadow-md max-h-[400px] overflow-x-auto min-h-[200px]">
       <h1 className="text-2xl font-bold mb-4">Pending Leave Requests</h1>
 
       <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
