@@ -45,22 +45,29 @@ function EmployeesComponent() {
   }, []);
 
   // Filter employees based on search term
-  useEffect(() => {
-    if (searchTerm) {
+  const filterEmployees = (term: string) => {
+    if (term) {
       setFilteredEmployees(
         employees.filter((employee) =>
-          employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          employee.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          employee.salary.toString().includes(searchTerm.toLowerCase())
+          employee.name.toLowerCase().includes(term.toLowerCase()) ||
+          employee.email.toLowerCase().includes(term.toLowerCase()) ||
+          employee.position.toLowerCase().includes(term.toLowerCase()) ||
+          employee.department.toLowerCase().includes(term.toLowerCase()) ||
+          employee.status.toLowerCase().includes(term.toLowerCase()) ||
+          employee.salary.toString().includes(term.toLowerCase())
         )
       );
     } else {
       setFilteredEmployees(employees);
     }
-  }, [searchTerm, employees]);
+  };
+
+  // Handle search when the Enter key is pressed
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      filterEmployees(searchTerm);
+    }
+  };
 
   // Handle page change
   const handlePageChange = (newPage: number) => {
@@ -96,7 +103,8 @@ function EmployeesComponent() {
           placeholder="Filter employees..."
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md w-full"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)} // Update search term as user types
+          onKeyDown={handleSearchKeyDown} // Trigger search only when Enter key is pressed
         />
       </div>
 

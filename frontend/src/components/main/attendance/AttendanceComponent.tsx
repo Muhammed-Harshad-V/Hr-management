@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import DatePicker from "react-datepicker";  // Import react-datepicker
+import "react-datepicker/dist/react-datepicker.css";  // Import CSS for the datepicker
 
 // TypeScript type for attendance record
 interface Attendance {
@@ -16,20 +18,21 @@ function AttendanceComponent() {
   const [attendanceData, setAttendanceData] = useState<Attendance[]>([]);  // Use Attendance type
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const [filterStartDate, setFilterStartDate] = useState<string>(""); // Start date of the range
-  const [filterEndDate, setFilterEndDate] = useState<string>(""); // End date of the range
-  const [filterEmployee, setFilterEmployee] = useState<string>("");
+  const [filterStartDate, setFilterStartDate] = useState<Date | null>(null); // Start date as Date object
+  const [filterEndDate, setFilterEndDate] = useState<Date | null>(null); // End date as Date object
+  const [filterEmployee, setFilterEmployee] = useState<string>(""); // Employee name filter
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage] = useState<number>(10); // Adjust the number of records per page
-  
+
   // Fetch attendance data based on filters (date range or specific employee)
   const fetchAttendance = async () => {
     try {
       setLoading(true);
       const params: { [key: string]: string } = {};  // Define params type
       if (filterStartDate && filterEndDate) {
-        params.start_date = filterStartDate;
-        params.end_date = filterEndDate;
+        // Convert Date to string format (YYYY-MM-DD)
+        params.start_date = filterStartDate.toISOString().split("T")[0];
+        params.end_date = filterEndDate.toISOString().split("T")[0];
       }
       if (filterEmployee) params.employee_name = filterEmployee;
 
@@ -46,7 +49,7 @@ function AttendanceComponent() {
 
   useEffect(() => {
     fetchAttendance();
-  }, [filterStartDate, filterEndDate, filterEmployee]);
+  }, [filterStartDate, filterEndDate]);
 
   // Handle page change
   const handlePageChange = (newPage: number) => {
@@ -71,24 +74,36 @@ function AttendanceComponent() {
 
       {/* Filter Bar */}
       <div className="flex flex-col justify-between items-center mb-4 lg:flex-row">
-        <input
-          type="date"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
-          value={filterStartDate}
-          onChange={(e) => setFilterStartDate(e.target.value)}
-        />
-        <input
-          type="date"
-          className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
-          value={filterEndDate}
-          onChange={(e) => setFilterEndDate(e.target.value)}
-        />
+        <div className="flex space-x-4">
+          <DatePicker
+            selected={filterStartDate}
+            onChange={(date: Date) => setFilterStartDate(date)}
+            placeholderText="Start Date"
+            className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md max-w-[200px]"
+            dateFormat="yyyy-MM-dd"
+            selectsStart
+            startDate={filterStartDate}
+            endDate={filterEndDate}
+          />
+          <DatePicker
+            selected={filterEndDate}
+            onChange={(date: Date) => setFilterEndDate(date)}
+            placeholderText="End Date"
+            className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md max-w-[200px]"
+            dateFormat="yyyy-MM-dd"
+            selectsEnd
+            startDate={filterStartDate}
+            endDate={filterEndDate}
+            minDate={filterStartDate}  // Ensure end date is after the start date
+          />
+        </div>
+
         <input
           type="text"
           placeholder="Filter by Name"
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md max-w-[200px]"
           value={filterEmployee}
-          onChange={(e) => setFilterEmployee(e.target.value)}
+          onChange={(e) => setFilterEmployee(e.target.value)}  // Update the filter employee as user types
           onKeyDown={handleEmployeeSearchKeyDown}  // Trigger search on Enter key press
         />
       </div>

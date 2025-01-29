@@ -93,7 +93,7 @@ function TodayCheckIn() {
       {/* See More Link (NavLink) */}
       <div className="mt-4 text-center">
         <NavLink
-          to="/attendance" // Adjust the path to your actual attendance page
+          to="/dashboard/attendance" // Adjust the path to your actual attendance page
           className="text-blue-600 font-semibold hover:text-blue-800 transition-colors duration-300"
         >
           See More

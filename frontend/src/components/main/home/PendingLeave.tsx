@@ -95,7 +95,7 @@ function PendingLeave() {
         {/* See More Link (NavLink) */}
         <div className="mt-4 text-center">
           <NavLink
-            to="/leaveRequests" // Adjust the path to your actual leave request page
+            to="/dashboard/leaveRequests" // Adjust the path to your actual leave request page
             className="text-blue-600 font-semibold hover:text-blue-800 transition-colors duration-300"
           >
             See All
