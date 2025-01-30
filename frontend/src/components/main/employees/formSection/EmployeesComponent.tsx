@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link, useNavigate } from "react-router-dom";
+import { handleApiError } from "@/api/ApiErrorHandler";
 
 // Define types for Employee data
 interface Employee {
@@ -32,8 +33,8 @@ function EmployeesComponent() {
       const response = await APIClientPrivate.get("/employeeService/employees"); // Replace with your API endpoint
       setEmployees(response.data || []); // Assuming `response.data` contains the list of employees
       setError("");
-    } catch (err) {
-      setError("Failed to load employees. Please try again later.");
+        } catch (err: any) {
+          handleApiError(err, setError)
     } finally {
       setLoading(false);
     }

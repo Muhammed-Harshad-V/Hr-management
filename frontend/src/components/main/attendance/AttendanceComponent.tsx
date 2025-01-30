@@ -3,6 +3,7 @@ import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import DatePicker from "react-datepicker";  // Import react-datepicker
 import "react-datepicker/dist/react-datepicker.css";  // Import CSS for the datepicker
+import { handleApiError } from "@/api/ApiErrorHandler";
 
 // TypeScript type for attendance record
 interface Attendance {
@@ -39,11 +40,10 @@ function AttendanceComponent() {
       const response = await APIClientPrivate.get("/attendanceService/attendance", { params });
       setAttendanceData(response.data || []);
       setError("");
-    } catch (err: any) {
-      setError("Failed to load attendance. Please try again later.");
-      console.error(err);
-    } finally {
-      setLoading(false);
+        } catch (err: any) {
+      handleApiError(err, setError)
+        } finally{
+          setLoading(false);
     }
   };
 

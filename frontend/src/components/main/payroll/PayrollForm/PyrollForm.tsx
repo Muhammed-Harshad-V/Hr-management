@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable"; // Required for auto-table plugin for jsPDF
-
+import { handleApiError } from "@/api/ApiErrorHandler";
 declare module 'jspdf' {
   interface jsPDF {
     autoTable: any; // Explicitly declare autoTable as any or the appropriate type
@@ -51,9 +51,8 @@ const PayrollForm = () => {
       const response = await APIClientPrivate.get("payrollService/payroll", { params });
       setPayrollData(response.data || []);
       setError("");
-    } catch (err) {
-      setError("Failed to load payroll. Please try again later.");
-      console.log(err);
+    } catch (err: any) {
+      handleApiError(err, setError)
     } finally {
       setLoading(false);
     }

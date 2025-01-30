@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import APIClientPrivate from "@/api/axios"; // API call
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // Table components
+import { handleApiError } from "@/api/ApiErrorHandler";
 
 // Type definitions for leave requests
 interface LeaveRequest {
@@ -31,9 +32,8 @@ function LeaveForm() {
       } else {
         setError("Unexpected response format.");
       }
-    } catch (err) {
-      setError("Failed to load leave requests.");
-      console.error(err);
+      } catch (err: any) {
+       handleApiError(err, setError)
     } finally {
       setLoading(false);
     }

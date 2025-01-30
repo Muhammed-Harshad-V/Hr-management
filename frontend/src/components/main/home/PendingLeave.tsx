@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom"; // Import NavLink from react-router-dom
 import APIClientPrivate from "@/api/axios"; // Assuming this is where you handle API requests
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { handleApiError } from "@/api/ApiErrorHandler";
 
 // Define TypeScript types for leave request
 interface LeaveRequest {
@@ -40,28 +41,8 @@ function PendingLeave() {
         // Handle unexpected status code
         setError(`Unexpected status code: ${response.status}. Please try again later.`);
       }
-    } catch (err: any) {
-      // Handle errors based on response status codes
-      if (err.response) {
-        switch (err.response.status) {
-          case 401:
-            setError("401 Unauthorized. Please log in again.");
-            break;
-          case 404:
-            setError("No Pending Leave Requests found.");
-            break;
-          case 500:
-            setError("500 Server error. Please try again later.");
-            break;
-          default:
-            setError(`Error: ${err.response.data.message || "Something went wrong."}`);
-        }
-      } else if (err.request) {
-        setError("No response from the server. Please check your connection.");
-      } else {
-        setError(`Request failed: ${err.message}`);
-      }
-      console.error(err);
+        } catch (err: any) {
+          handleApiError(err, setError)
     } finally {
       setLoading(false); // Set loading state to false once the API call finishes
     }

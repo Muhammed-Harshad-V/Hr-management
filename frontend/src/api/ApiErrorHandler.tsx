@@ -1,0 +1,30 @@
+// Utility function to handle API errors
+export const handleApiError = (err: any, setError: React.Dispatch<React.SetStateAction<string>>) => {
+    if (err.response) {
+      // If there is a response, check the status code to determine the error message
+      switch (err.response.status) {
+        case 400:
+          setError("400 Bad Request. Please check your input.");
+          break;
+        case 401:
+          setError("401 Unauthorized. Please log in again.");
+          break;
+        case 404:
+          setError("404 Not Found. Please check the URL or resource.");
+          break;
+        case 500:
+          setError("500 Server Error. Please try again later.");
+          break;
+        default:
+          setError(`Error: ${err.response.data.message || "Something went wrong."}`);
+      }
+    } else if (err.request) {
+      // If the request was made but no response was received
+      setError("No response from the server. Please check your connection.");
+    } else {
+      // For any other errors
+      setError(`Request failed: ${err.message}`);
+    }
+    console.error(err);
+  };
+  

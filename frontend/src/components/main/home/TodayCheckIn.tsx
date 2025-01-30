@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom"; // Import NavLink for routing
 import APIClientPrivate from "@/api/axios"; // API call
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // Table components
+import { handleApiError } from "@/api/ApiErrorHandler";
 
 // Define types for the check-in data
 interface CheckInData {
@@ -28,33 +29,7 @@ function TodayCheckIn() {
         setError(`Unexpected status code: ${response.status}. Please try again later.`);
       }
     } catch (err: any) {
-      // Check if it's a known error and handle accordingly
-      if (err.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        switch (err.response.status) {
-          case 401:
-            setError("401 Unauthorized. Please log in again.");
-            // Optionally, you can redirect the user to the login page
-            // navigate("/login");
-            break;
-          case 404:
-            setError("404 Today's check-ins not found. Please try again later.");
-            break;
-          case 500:
-            setError("500 Server error. Please try again later.");
-            break;
-          default:
-            setError(`Error ${err.response.status}: ${err.response.data.message || "Something went wrong."}`);
-        }
-      } else if (err.request) {
-        // The request was made but no response was received
-        setError("No response from the server. Please check your connection.");
-      } else {
-        // Something happened in setting up the request
-        setError(`Request failed: ${err.message}`);
-      }
-      console.error(err); // Log the error for debugging
+      handleApiError(err, setError)
     } finally {
       setLoading(false); // Set loading state to false once the API call finishes
     }
