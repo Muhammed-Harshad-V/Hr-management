@@ -48,7 +48,7 @@ function PendingLeave() {
             setError("401 Unauthorized. Please log in again.");
             break;
           case 404:
-            setError("404 Leave requests not found.");
+            setError("No Pending Leave Requests found.");
             break;
           case 500:
             setError("500 Server error. Please try again later.");

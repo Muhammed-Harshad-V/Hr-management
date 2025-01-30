@@ -35,7 +35,7 @@ const LoginComponent = () => {
   };;
 
   return (
-    <div className="h-[90vh] flex items-center justify-center bg-gray-100 dark:bg-less-black text-black dark:text-white">
+    <div className="h-[100svh] flex items-center justify-center bg-gray-100 dark:bg-less-black text-black dark:text-white">
       <div className="bg-white dark:bg-black shadow-md rounded-lg p-6 max-w-md w-full">
         <h2 className="md:text-2xl font-bold mb-6 text-center text-xl">Login</h2>
         <form onSubmit={handleLogin} className="">

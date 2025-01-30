@@ -73,7 +73,7 @@ router.put('/leaveRequests/:id', auth, async (req, res) => {
 
 
   // all leave request
-  router.get('/leaveRequests/status/overview', async (req, res) => {
+  router.get('/leaveRequests/status/overview', auth, async (req, res) => {
     try {
         const { status, startDate, endDate } = req.query;
 

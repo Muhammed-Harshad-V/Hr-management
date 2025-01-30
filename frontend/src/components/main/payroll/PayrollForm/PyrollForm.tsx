@@ -1,9 +1,23 @@
 import { useState, useEffect, ChangeEvent } from "react";
-import { NavLink, useNavigate } from "react-router-dom"; // Import NavLink for routing
+import { NavLink, useNavigate } from "react-router-dom";
 import APIClientPrivate from "@/api/axios";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import "jspdf-autotable"; // Required for auto-table plugin for jsPDF
 
-// Define types for payroll data
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: any; // Explicitly declare autoTable as any or the appropriate type
+    lastAutoTable: any; // Same for lastAutoTable
+  }
+}
+
+interface Deduction {
+  type: string;
+  amount: number;
+}
+
 interface Payroll {
   _id: string;
   employee_name: string;
@@ -12,31 +26,31 @@ interface Payroll {
   gross_salary: number;
   net_salary: number;
   status: string;
+  deductions: Deduction[]; // Add deductions property
 }
 
 const PayrollForm = () => {
   const navigate = useNavigate();
-  const [payrollData, setPayrollData] = useState<Payroll[]>([]); // Type state as an array of Payroll objects
+  const [payrollData, setPayrollData] = useState<Payroll[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>(""); // Type error state as string
-  const [filterMonth, setFilterMonth] = useState<string>(""); // Filter month type as string
-  const [filterYear, setFilterYear] = useState<string>(""); // Filter year type as string
-  const [filterEmployee, setFilterEmployee] = useState<string>(""); // Filter employee type as string
-  const [currentPage, setCurrentPage] = useState<number>(1); // Current page type as number
-  const [itemsPerPage] = useState<number>(10); // Items per page type as number
+  const [error, setError] = useState<string>("");
+  const [filterMonth, setFilterMonth] = useState<string>("");
+  const [filterYear, setFilterYear] = useState<string>("");
+  const [filterEmployee, setFilterEmployee] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(10);
 
-  // Fetch payroll data based on filters
   const fetchPayroll = async () => {
     try {
       setLoading(true);
-      const params: { [key: string]: string } = {}; // Declare params as an object with string keys
+      const params: { [key: string]: string } = {};
       if (filterMonth) params.month = filterMonth;
       if (filterYear) params.year = filterYear;
       if (filterEmployee) params.employee_name = filterEmployee;
 
       const response = await APIClientPrivate.get("payrollService/payroll", { params });
-      setPayrollData(response.data || []); // Type response.data correctly
-      setError(""); // Clear any previous error
+      setPayrollData(response.data || []);
+      setError("");
     } catch (err) {
       setError("Failed to load payroll. Please try again later.");
       console.log(err);
@@ -45,47 +59,135 @@ const PayrollForm = () => {
     }
   };
 
-  // UseEffect hook to fetch payroll on initial load
   useEffect(() => {
     fetchPayroll();
-  }, []); // Initial fetch without any filters
+  }, []);
 
-  // Handle page change
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
-  // Get current payroll to be displayed on the page
   const indexOfLastRecord = currentPage * itemsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
   const currentPayroll = payrollData.slice(indexOfFirstRecord, indexOfLastRecord);
 
-  // Trigger search on Enter key press
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      fetchPayroll(); // Trigger the fetch when Enter is pressed
+      fetchPayroll();
     }
   };
 
-  // Function to format salary to integer (removes decimal part)
   const formatSalary = (salary: number) => {
-    return Math.floor(salary); // Removes the decimal part
+    return Math.floor(salary);
   };
 
-  // Function to get the color class for the status
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "text-yellow-500"; // Yellow for pending
+        return "text-yellow-500";
       case "processed":
-        return "text-blue-500"; // Blue for processed
+        return "text-blue-500";
       case "paid":
-        return "text-green-500"; // Green for paid
+        return "text-green-500";
       case "failed":
-        return "text-red-500"; // Red for failed
+        return "text-red-500";
       default:
-        return "text-gray-500"; // Default gray if status is unknown
+        return "text-gray-500";
     }
+  };
+
+  // Export to Excel with Deductions
+  const exportToExcel = () => {
+    const excelData = payrollData.map((payroll) => {
+      // Flatten data to include deductions
+      const deductions = payroll.deductions.map((deduction) => `${deduction.type}: $${deduction.amount}`).join(", ");
+      return {
+        EmployeeName: payroll.employee_name,
+        Month: payroll.month,
+        Year: payroll.year,
+        GrossSalary: formatSalary(payroll.gross_salary),
+        NetSalary: formatSalary(payroll.net_salary),
+        Status: payroll.status,
+        Deductions: deductions, // Add deductions in a new column
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Payroll Data");
+    XLSX.writeFile(wb, "Payroll_Data.xlsx");
+  };
+
+// Export a single payroll record to PDF with Deductions (in a table format)
+const exportSingleToPDF = (payroll: Payroll) => {
+  const doc = new jsPDF();
+
+  // Adding title
+  doc.setFontSize(18);
+  doc.text(`Payroll for ${payroll.employee_name}`, 10, 10);
+  
+  // Table Header
+  doc.setFontSize(12);
+  doc.autoTable({
+    startY: 20,
+    head: [["Attribute", "Details"]],
+    body: [
+      ["Employee Name", payroll.employee_name],
+      ["Month", payroll.month],
+      ["Year", payroll.year],
+      ["Gross Salary", `$${formatSalary(payroll.gross_salary)}`],
+      ["Net Salary", `$${formatSalary(payroll.net_salary)}`],
+      ["Status", payroll.status],
+    ],
+    theme: "striped", // Adding striped rows for better readability
+  });
+
+  // Adding a new line before Deductions section
+  doc.text("Deductions:", 10, doc.lastAutoTable.finalY + 10);
+
+  // Deductions Table
+  const deductionData = payroll.deductions.map(ded => [ded.type, `$${ded.amount}`]);
+  doc.autoTable({
+    startY: doc.lastAutoTable.finalY + 15,
+    head: [["Deduction Type", "Amount"]],
+    body: deductionData,
+    theme: "striped", // Adding striped rows for better readability
+  });
+
+  // Saving the PDF
+  doc.save(`${payroll.employee_name}_Payroll.pdf`);
+};
+
+
+  // Export all payroll data to PDF with Deductions
+  const exportAllToPDF = () => {
+    const doc = new jsPDF();
+    const tableData = payrollData.map((payroll) => [
+      payroll.employee_name,
+      payroll.month,
+      payroll.year,
+      formatSalary(payroll.gross_salary),
+      formatSalary(payroll.net_salary),
+      payroll.status,
+      payroll.deductions.map(ded => `${ded.type}: $${ded.amount}`).join(", "), // Include deductions
+    ]);
+
+    doc.autoTable({
+      head: [
+        [
+          "Employee Name",
+          "Month",
+          "Year",
+          "Gross Salary",
+          "Net Salary",
+          "Status",
+          "Deductions", // Add a new column for Deductions
+        ],
+      ],
+      body: tableData,
+    });
+
+    doc.save("All_Payroll_Data.pdf");
   };
 
   return (
@@ -94,7 +196,7 @@ const PayrollForm = () => {
         <h1 className="text-2xl font-bold mb-4">Payroll Records</h1>
         <div className="mt-4 text-center">
           <NavLink
-            to="/dashboard/payroll/generate" // Route to generate payroll page
+            to="/dashboard/payroll/generate"
             className="bg-blue-600 text-white font-semibold hover:bg-blue-700 rounded-md py-2 px-4 transition-colors duration-300"
           >
             Generate Payroll
@@ -110,7 +212,7 @@ const PayrollForm = () => {
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
           value={filterEmployee}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterEmployee(e.target.value)}
-          onKeyDown={handleKeyDown} // Trigger search on Enter key press
+          onKeyDown={handleKeyDown}
         />
         <input
           type="number"
@@ -118,7 +220,7 @@ const PayrollForm = () => {
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mr-2 mb-2 max-w-[200px]"
           value={filterMonth}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterMonth(e.target.value)}
-          onKeyDown={handleKeyDown} // Trigger search on Enter key press
+          onKeyDown={handleKeyDown}
         />
         <input
           type="number"
@@ -126,7 +228,7 @@ const PayrollForm = () => {
           className="p-2 border border-gray-300 dark:border-none dark:bg-gray-800 rounded-md mb-2 max-w-[200px]"
           value={filterYear}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterYear(e.target.value)}
-          onKeyDown={handleKeyDown} // Trigger search on Enter key press
+          onKeyDown={handleKeyDown}
         />
       </div>
 
@@ -167,6 +269,12 @@ const PayrollForm = () => {
                       >
                         Edit
                       </button>
+                      <button
+                        onClick={() => exportSingleToPDF(payroll)}
+                        className="text-blue-500 hover:text-blue-600"
+                      >
+                        Export PDF
+                      </button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -198,10 +306,23 @@ const PayrollForm = () => {
               Next
             </button>
           </div>
+
+          <div className="mt-4 flex justify-between">
+            <button
+              onClick={exportToExcel}
+              className="bg-blue-500 text-white text-[13px] py-2 px-4 rounded-md hover:bg-blue-600"
+            >
+              Excel
+            </button>
+            <button
+              onClick={exportAllToPDF}
+              className="bg-blue-500 text-white text-[13px] py-2 px-4 rounded-md hover:bg-blue-600"
+            >
+              PDF
+            </button>
+          </div>
         </div>
       )}
-
-      {/* Generate Payroll NavLink */}
     </div>
   );
 };

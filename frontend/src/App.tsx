@@ -27,10 +27,6 @@ function App() {
           ),
         },
         {
-          path: "/dashboard/login",  // Path for the login page
-          element: <Login />,
-        },
-        {
           path: "/dashboard/employees",  // Path for the Employees page
           element: (
             <ProtectedRoute>
@@ -95,6 +91,10 @@ function App() {
           ),
         },
       ],
+    },
+    {
+      path: "/dashboard/login",  // Path for the login page
+      element: <Login />,
     },
   ]);
 
