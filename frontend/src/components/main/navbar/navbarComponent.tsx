@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom"; // Use NavLink for routing
 import ThemeToggle from "../themeToggle/ThemeToggle";
 import APIClientPrivate from "@/api/axios"; // Assume this is your API client for making requests
+import { io } from "socket.io-client";
+import { S_api } from "@/api/axios"; // Assuming S_api holds your API base URL
 
 const NavbarComponent = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const [unreadNotifications, setUnreadNotifications] = useState(false); // Track unread notifications
   const navigate = useNavigate();
 
   // Define the routes for the sidebar dynamically
@@ -16,6 +19,24 @@ const NavbarComponent = () => {
     { name: "Payroll", to: "/dashboard/payroll" },
     { name: "Leave Requests", to: "/dashboard/leaveRequests" },
   ];
+
+  // WebSocket setup
+  const socket = io(`${S_api}`, {
+    transports: ['websocket']
+  });
+
+  // Listen for 'notification' events
+  useEffect(() => {
+    socket.on('notification', () => {
+      // Whenever a notification is received, set unread notifications to true
+      setUnreadNotifications(true);
+    });
+
+    // Cleanup socket connection when the component unmounts
+    return () => {
+      socket.off('notification');
+    };
+  }, [socket]);
 
   // Check window size on resize
   useEffect(() => {
@@ -45,16 +66,11 @@ const NavbarComponent = () => {
     };
   }, []);
 
-  const autoclose = () => {
-    if (window.innerWidth < 1024) {
-      setIsSidebarOpen(false);
-    }
-  };
-
+  // Handle logout
   const handleLogout = async () => {
     try {
       // Send logout API request to backend (if necessary)
-      await APIClientPrivate.get("employeeService/logout"); // Replace with your actual logout endpoint
+      await APIClientPrivate.get("employeeService/logout");
 
       // Remove token from localStorage and update login status
       localStorage.removeItem("login");
@@ -65,21 +81,66 @@ const NavbarComponent = () => {
     }
   };
 
+  // Handle notification click (mark as read)
+  const handleNotifications = () => {
+    // Reset unread notifications when the user clicks the bell
+    setUnreadNotifications(false);
+    // Optionally, show a list of notifications in a modal or dropdown
+    console.log('Notifications viewed');
+  };
+
+  const autoclose = () => {
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col text-black dark:text-white">
       {/* Top Navbar */}
       <header className="text-black dark:text-white px-4 py-3 flex justify-between items-center bg-white dark:bg-black">
         <h1 className="text-lg font-bold">Admin Panel</h1>
-        <div className="flex flex-row">
+        <div className="flex flex-row items-center space-x-4">
+          {/* Sidebar Toggle Button */}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="px-3 py-2 bg-gray-100 rounded-md focus:outline-none mr-3 dark:bg-less-black"
+            className="px-3 py-2 bg-gray-100 rounded-md focus:outline-none dark:bg-less-black"
           >
             ☰
           </button>
+
+          {/* Notification Bell Icon */}
+          <button
+            onClick={handleNotifications} // Add your notification handler here
+            className="relative px-3 py-2 bg-gray-100 rounded-md focus:outline-none dark:bg-less-black"
+          >
+            {/* Bell Icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-gray-800 dark:text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.012 2.012 0 0020 14V10a6 6 0 00-12 0v4a2.012 2.012 0 00-.595 1.595L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              />
+            </svg>
+
+            {/* Notification Badge (if any notifications are present) */}
+            {unreadNotifications && (
+              <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-black"></span>
+            )}
+          </button>
+
+          {/* Theme Toggle */}
           <ThemeToggle />
         </div>
       </header>
+
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
