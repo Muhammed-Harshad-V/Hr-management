@@ -66,3 +66,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* Sliding animation from top */
+@keyframes slideIn {
+  0% {
+    transform: translateY(-100px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Apply sliding animation */
+.slide-in {
+  animation: slideIn 0.5s forwards;
+}

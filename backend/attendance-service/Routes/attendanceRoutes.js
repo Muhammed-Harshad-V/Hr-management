@@ -63,7 +63,7 @@ router.post('/attendance/check-in', async (req, res) => {
 
        // Emit a notification to all connected clients
        const io = getIo();
-       const notificationMessage = `Another one`;
+       const notificationMessage = `${name} has checked in`;
        io.emit('notification', notificationMessage);  // Send notification to all clients
 
 

@@ -7,8 +7,7 @@ import { S_api } from "@/api/axios"; // Assuming S_api holds your API base URL
 
 const NavbarComponent = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
-  const [unreadNotifications, setUnreadNotifications] = useState(false); // Track unread notifications
+  const [notification, setNotification] = useState(null); // Track notification state
   const navigate = useNavigate();
 
   // Define the routes for the sidebar dynamically
@@ -27,9 +26,14 @@ const NavbarComponent = () => {
 
   // Listen for 'notification' events
   useEffect(() => {
-    socket.on('notification', () => {
-      // Whenever a notification is received, set unread notifications to true
-      setUnreadNotifications(true);
+    socket.on('notification', (message) => {
+      // Show notification with message
+      setNotification(message);
+
+      // Hide notification after 5 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     });
 
     // Cleanup socket connection when the component unmounts
@@ -48,17 +52,9 @@ const NavbarComponent = () => {
       }
     };
 
-    // Check login status from localStorage on component mount
-    const checkLoginStatus = () => {
-      const token = localStorage.getItem("login");
-      setIsLoggedIn(!!token);
-    };
 
     // Add event listener for resize
     window.addEventListener("resize", handleResize);
-
-    // Check login status when component mounts
-    checkLoginStatus();
 
     // Cleanup event listener on component unmount
     return () => {
@@ -74,19 +70,10 @@ const NavbarComponent = () => {
 
       // Remove token from localStorage and update login status
       localStorage.removeItem("login");
-      setIsLoggedIn(false);
       navigate("/dashboard/login"); // Redirect to login page after logout
     } catch (error) {
       console.error("Logout failed", error);
     }
-  };
-
-  // Handle notification click (mark as read)
-  const handleNotifications = () => {
-    // Reset unread notifications when the user clicks the bell
-    setUnreadNotifications(false);
-    // Optionally, show a list of notifications in a modal or dropdown
-    console.log('Notifications viewed');
   };
 
   const autoclose = () => {
@@ -98,7 +85,7 @@ const NavbarComponent = () => {
   return (
     <div className="h-screen flex flex-col text-black dark:text-white">
       {/* Top Navbar */}
-      <header className="text-black dark:text-white px-4 py-3 flex justify-between items-center bg-white dark:bg-black">
+      <header className="text-black dark:text-white px-4 py-3 flex justify-between items-center bg-white dark:bg-black z-20">
         <h1 className="text-lg font-bold">Admin Panel</h1>
         <div className="flex flex-row items-center space-x-4">
           {/* Sidebar Toggle Button */}
@@ -109,38 +96,17 @@ const NavbarComponent = () => {
             ☰
           </button>
 
-          {/* Notification Bell Icon */}
-          <button
-            onClick={handleNotifications} // Add your notification handler here
-            className="relative px-3 py-2 bg-gray-100 rounded-md focus:outline-none dark:bg-less-black"
-          >
-            {/* Bell Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-800 dark:text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 17h5l-1.405-1.405A2.012 2.012 0 0020 14V10a6 6 0 00-12 0v4a2.012 2.012 0 00-.595 1.595L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-              />
-            </svg>
-
-            {/* Notification Badge (if any notifications are present) */}
-            {unreadNotifications && (
-              <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-black"></span>
-            )}
-          </button>
-
           {/* Theme Toggle */}
           <ThemeToggle />
         </div>
       </header>
 
+      {/* Sliding Notification */}
+      {notification && (
+        <div className="fixed top-[70px] right-[30px] p-[10px] bg-white dark:bg-black text-black dark:text-white rounded-lg shadow-lg transform transition-all duration-500 ease-in-out slide-in">
+          <p className="xl:text-[16px] lg:text-[14px] sm:text-[12px]">{notification}</p>
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
@@ -182,21 +148,13 @@ const NavbarComponent = () => {
 
             {/* Bottom section with login/logout button */}
             <div className="mt-auto">
-              {isLoggedIn ? (
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 w-full"
                 >
                   Logout
                 </button>
-              ) : (
-                <NavLink
-                  to="/dashboard/login"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-full"
-                >
-                  Login
-                </NavLink>
-              )}
+
             </div>
           </nav>
         </div>
