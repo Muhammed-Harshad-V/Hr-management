@@ -1,47 +1,57 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-require('dotenv').config();
-const attendance = require('./Routes/attendanceRoutes');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const Attendance = require('./model/attendance'); // Adjust the path as necessary
+require('dotenv').config();
+const http = require('http');
+const {initSocket} = require('./socket.io')
+
+
+// Import your routes and models
+const attendance = require('./Routes/attendanceRoutes');
+const Attendance = require('./model/attendance');
 const DailyAttendance = require('./model/DailyAttendance');
+
 const app = express();
+const server = http.createServer(app);  // Create HTTP server
+
+  // Initialize Socket.IO with the Express server
+  initSocket(server);
+
 const port = process.env.PORT || 3002;
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
-  credentials: true // Allow credentials (cookies, authorization headers)
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers
+  credentials: true  // Allow credentials (cookies, authorization headers)
 }));
-
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use('/', attendance);
+app.use('/', attendance);  // Your routes for handling attendance
 
 // MongoDB connection
-const dbURI = process.env.MURL 
-// || 'mongodb://localhost:27017/attendance-service';
-console.log({ dbURI }); // Log the URI to check if it's loaded properly
+const dbURI = process.env.MURL;
+console.log({ dbURI });  // Log the URI to check if it's loaded properly
 mongoose.connect(dbURI)
-    .then(() => console.log('MongoDB connected...'))
-    .catch(err => {
-        console.error('MongoDB connection error:', err);
-        process.exit(1);  // Exit if MongoDB connection fails
-    });
+  .then(() => console.log('MongoDB connected...'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);  // Exit if MongoDB connection fails
+  });
 
-// Basic route
-app.get('/', (req, res) => {
-    res.send('Hello World!');
+
+
+
+// Start the server (Express + Socket.IO)
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
 
-// Start server
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+
+
 
 // Create some dummy data for today's check-ins
 const createDummyData = async () => {

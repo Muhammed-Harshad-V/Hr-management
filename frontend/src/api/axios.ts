@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000";
+ export const API_URL = "http://localhost:3000";
+ export const S_api = "http://localhost:3002";
 
 const APIClientPrivate = axios.create({
     baseURL: API_URL,

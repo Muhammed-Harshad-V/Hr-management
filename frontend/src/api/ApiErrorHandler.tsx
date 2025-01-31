@@ -6,11 +6,11 @@ export const handleApiError = (err: any, setError: React.Dispatch<React.SetState
         case 400:
           setError("400 Bad Request. Please check your input.");
           break;
-        case 401:
+        case 401:     
           setError("401 Unauthorized. Please log in again.");
           break;
         case 404:
-          setError("404 Not Found. Please check the URL or resource.");
+          setError("404 Not Found.");
           break;
         case 500:
           setError("500 Server Error. Please try again later.");

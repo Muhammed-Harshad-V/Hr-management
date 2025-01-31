@@ -1,12 +1,18 @@
 import  { useState, useEffect } from 'react';
 import APIClientPrivate from '@/api/axios';
+import { io } from 'socket.io-client';
+import { S_api } from '@/api/axios';
 
 function HomeCount() {
     const [employeeCount, setEmployeeCount] = useState(0);
     const [checkInCount, setCheckInCount] = useState(0);
+    const socket = io(`${S_api}`, {
+        transports: ['websocket']
+      });
+      
 
     // Fetch data from the server
-    const CheckInCount = async () => {
+    const CheckInCountCall = async () => {
         try {
             const checkInResponse = await APIClientPrivate.get('/attendanceService/attendance/checkInCount');
             setCheckInCount(checkInResponse.data.checkInCount || 0);
@@ -15,7 +21,7 @@ function HomeCount() {
         }
     };
 
-    const EmployeeCount = async () => {
+    const EmployeeCountCall = async () => {
         try {
         const employeeResponse = await APIClientPrivate.get('/employeeService/employees/count');
         setEmployeeCount(employeeResponse.data.totalEmployees || 0);
@@ -25,30 +31,26 @@ function HomeCount() {
 
     };
 
-    // Setup SSE listener
-    const setupSSE = () => {
-        const eventSource = new EventSource('http://localhost:3000/attendanceService/attendance/events', {
-            withCredentials: true,  // This ensures credentials (like cookies) are sent with the request
-          });
-          
-
-            // Listen for the 'newCheckIn' event
-            eventSource.onmessage = () => {
-                CheckInCount(); // Refetch counts on new check-in
-            };
-
-        // Cleanup SSE connection on component unmount
+    useEffect(() => {
+        // Listen for 'notification' events from the server
+        socket.on('notification', () => {
+            CheckInCountCall();
+            console.log('working file');
+        });
+    
+        // Clean up the socket connection when the component unmounts
         return () => {
-            eventSource.close();
+          socket.off('notification');
         };
-    };
+      }, [socket]);
+
+
+
 
     // Fetch counts on mount and setup SSE
     useEffect(() => {
-        CheckInCount();
-        EmployeeCount();
-        const cleanupSSE = setupSSE();
-        return cleanupSSE; // Cleanup function
+        CheckInCountCall();
+        EmployeeCountCall();
     }, []);
 
     return (

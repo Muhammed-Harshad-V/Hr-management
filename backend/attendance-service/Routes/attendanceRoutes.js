@@ -3,10 +3,8 @@ const Attendance = require('../model/attendance'); // Adjust the path as necessa
 const router = express.Router();
 const auth = require('../middleware/auth')
 const DailyAttendance = require('../model/DailyAttendance'); // New schema for daily attendance
-const EventEmitter = require('events');
-const eventEmitter = new EventEmitter(); // Initialize a new EventEmitter instance
 const { default: mongoose } = require('mongoose');
-
+const { getIo } = require('../socket.io');
 
 // Check-in Route
 router.post('/attendance/check-in', async (req, res) => {
@@ -63,8 +61,11 @@ router.post('/attendance/check-in', async (req, res) => {
 
     await dailyAttendance.save();
 
-    // Notify the frontend via SSE
-    eventEmitter.emit('newCheckIn', { employeeId, name, checkInTime });
+       // Emit a notification to all connected clients
+       const io = getIo();
+       const notificationMessage = `Another one`;
+       io.emit('notification', notificationMessage);  // Send notification to all clients
+
 
     res.status(201).send({ message: 'Check-in successful', attendance: newAttendance });
   } catch (error) {
@@ -73,23 +74,7 @@ router.post('/attendance/check-in', async (req, res) => {
   }
 });
 
-// SSE Endpoint
-router.get('/attendance/events', auth, (req, res) => {
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
 
-    const onNewCheckIn = (data) => {
-      res.write(`data: ${JSON.stringify(data)}\n\n`);
-    };
-
-    eventEmitter.on('newCheckIn', onNewCheckIn);
-
-    // Remove listener when the client disconnects
-    req.on('close', () => {
-        eventEmitter.removeListener('newCheckIn', onNewCheckIn);
-    });
-});
 
 
 // Check-out route (update check-out time)

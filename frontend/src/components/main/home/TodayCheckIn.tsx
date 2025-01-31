@@ -3,6 +3,8 @@ import { NavLink } from "react-router-dom"; // Import NavLink for routing
 import APIClientPrivate from "@/api/axios"; // API call
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // Table components
 import { handleApiError } from "@/api/ApiErrorHandler";
+import { io } from 'socket.io-client';
+import { S_api } from '@/api/axios';
 
 // Define types for the check-in data
 interface CheckInData {
@@ -14,6 +16,10 @@ function TodayCheckIn() {
   const [checkInData, setCheckInData] = useState<CheckInData[]>([]); // State for check-ins
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [error, setError] = useState<string>(""); // Error message state
+
+  const socket = io(`${S_api}`, {
+    transports: ['websocket']
+  });
 
   const fetchCheckInData = async () => {
     try {
@@ -34,30 +40,25 @@ function TodayCheckIn() {
       setLoading(false); // Set loading state to false once the API call finishes
     }
   };
-  
 
-  // Setup SSE listener to receive real-time updates for new check-ins
-  const setupSSE = () => {
-    const eventSource = new EventSource('http://localhost:3000/attendanceService/attendance/events', {
-      withCredentials: true,  // This ensures credentials (like cookies) are sent with the request
+  useEffect(() => {
+    // Listen for 'notification' events from the server
+    socket.on('notification', () => {
+      fetchCheckInData();
+      console.log('thgis also worked')
     });
 
-    // Listen for the 'newCheckIn' event to trigger the refetch of check-in data
-    eventSource.onmessage = () => {
-      fetchCheckInData(); // Refetch check-ins when a new check-in occurs
-    };
-
-    // Return a cleanup function that closes the SSE connection when the component unmounts
+    // Clean up the socket connection when the component unmounts
     return () => {
-      eventSource.close();
+      socket.off('notification');
     };
-  };
+  }, [socket]);
+  
+
 
   // Fetch check-ins on component mount and setup SSE listener
   useEffect(() => {
     fetchCheckInData(); // Fetch initial check-in data
-    const cleanupSSE = setupSSE(); // Set up SSE for real-time updates
-    return cleanupSSE; // Cleanup function for SSE on unmount
   }, []); // Empty dependency array means this effect runs once on mount
 
   return (
