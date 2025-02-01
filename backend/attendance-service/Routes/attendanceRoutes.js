@@ -27,7 +27,7 @@ router.post('/attendance/check-in', async (req, res) => {
     if (!validationResponse || !validationResponse.isValid) {
       return res.status(404).send({ error: 'Employee not found in user service' });
     }
-
+ 
 
     // Step 2: Proceed with check-in logic
     const date = new Date().toISOString().split('T')[0];

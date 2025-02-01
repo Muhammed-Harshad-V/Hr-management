@@ -7,7 +7,7 @@ import { S_api } from "@/api/axios"; // Assuming S_api holds your API base URL
 
 const NavbarComponent = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
-  const [notification, setNotification] = useState(null); // Track notification state
+  const [notification, setNotification] = useState<string | null>(null); // Allows both string and null
   const navigate = useNavigate();
 
   // Define the routes for the sidebar dynamically
