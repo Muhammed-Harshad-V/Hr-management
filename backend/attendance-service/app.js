@@ -12,6 +12,7 @@ const {initSocket} = require('./socket.io')
 const attendance = require('./Routes/attendanceRoutes');
 const Attendance = require('./model/attendance');
 const DailyAttendance = require('./model/DailyAttendance');
+const {initializeRabbitMQ} = require('./utils/rabbitmq')
 
 const app = express();
 const server = http.createServer(app);  // Create HTTP server

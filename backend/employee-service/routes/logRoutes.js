@@ -9,8 +9,7 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const employee = await Employee.findOne({ email }).select('+password');
-        console.log('Provided password:', password);   // Provided by the user
-        console.log('Stored password hash:', employee.password); // Stored in the database
+
 
         if (!employee) {
             return res.status(400).json({ message: 'Invalid email or password' });

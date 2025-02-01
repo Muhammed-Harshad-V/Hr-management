@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "@faker-js/faker": "^9.4.0",
+    "amqplib": "^0.10.5",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

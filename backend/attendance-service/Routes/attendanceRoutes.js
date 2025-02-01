@@ -5,6 +5,7 @@ const auth = require('../middleware/auth')
 const DailyAttendance = require('../model/DailyAttendance'); // New schema for daily attendance
 const { default: mongoose } = require('mongoose');
 const { getIo } = require('../socket.io');
+const { sendRPC } = require('../utils/rabbitmq'); // Import RabbitMQ helper
 
 // Check-in Route
 router.post('/attendance/check-in', async (req, res) => {
@@ -15,35 +16,45 @@ router.post('/attendance/check-in', async (req, res) => {
       return res.status(400).send({ error: 'Employee ID and name are required' });
     }
 
-    const date = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
-    const checkInTime = new Date(); // Current date-time object
+    // Step 1: Validate employee via RabbitMQ RPC
+    const validationResponse = await sendRPC(
+      'user_validation_queue', // Queue name for user service
+      { employeeId, name }     // Payload
+    );
 
-    // Check if the employee has already checked in for today in the Attendance model
+
+    // Check validation result
+    if (!validationResponse || !validationResponse.isValid) {
+      return res.status(404).send({ error: 'Employee not found in user service' });
+    }
+
+
+    // Step 2: Proceed with check-in logic
+    const date = new Date().toISOString().split('T')[0];
+    const checkInTime = new Date();
+
+    // Existing checks...
     const existingAttendance = await Attendance.findOne({ employee_id: employeeId, date });
-
     if (existingAttendance) {
       return res.status(400).send({ error: 'Employee has already checked in for today' });
     }
 
-    // Create a new record in the Attendance model, including employee_name
+    // Create new attendance record
     const newAttendance = new Attendance({
       employee_id: employeeId,
-      employee_name: name, // Add employee_name to the attendance record
+      employee_name: name,
       date,
       check_in_time: checkInTime,
     });
 
     await newAttendance.save();
 
-    // Update the DailyAttendance model
+    // Update DailyAttendance
     let dailyAttendance = await DailyAttendance.findOne({ date });
-
     if (!dailyAttendance) {
-      // Create a new daily attendance document if none exists
       dailyAttendance = new DailyAttendance({ date, employees: [] });
     }
 
-    // Check if the employee has already checked in in DailyAttendance
     const alreadyCheckedIn = dailyAttendance.employees.some(
       (emp) => emp.employeeId.toString() === employeeId
     );
@@ -52,7 +63,6 @@ router.post('/attendance/check-in', async (req, res) => {
       return res.status(400).send({ error: 'Employee has already checked in for today' });
     }
 
-    // Add employee's check-in details to DailyAttendance, including the name
     dailyAttendance.employees.push({
       employeeId,
       name,
@@ -61,19 +71,19 @@ router.post('/attendance/check-in', async (req, res) => {
 
     await dailyAttendance.save();
 
-       // Emit a notification to all connected clients
-       const io = getIo();
-       const notificationMessage = `${name} has checked in`;
-       io.emit('notification', notificationMessage);  // Send notification to all clients
-
+    // Emit notification
+    const io = getIo();
+    io.emit('notification', `${name} has checked in`);
 
     res.status(201).send({ message: 'Check-in successful', attendance: newAttendance });
   } catch (error) {
     console.error('Error during check-in:', error);
-    res.status(500).send({ error: 'Error while checking in', details: error });
+    res.status(500).send({ 
+      error: 'Error while checking in',
+      details: error.message 
+    });
   }
 });
-
 
 
 

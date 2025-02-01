@@ -26,7 +26,7 @@ const NavbarComponent = () => {
 
   // Listen for 'notification' events
   useEffect(() => {
-    socket.on('notification', (message) => {
+    socket.on('notification', (message: string) => {
       // Show notification with message
       setNotification(message);
 
