@@ -5,7 +5,7 @@ const auth = async (req, res, next) => {
     try {
         // Get the token from cookies or the Authorization header
         const token = req.cookies?.token || req.headers?.authorization?.split(' ')[1];
-
+             console.log(token)
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized: No token provided' });
         }
@@ -13,6 +13,7 @@ const auth = async (req, res, next) => {
 
         // Decode the token to get user data
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log(decoded)
 
         // Attach decoded user information to request object
         req.user = decoded;
