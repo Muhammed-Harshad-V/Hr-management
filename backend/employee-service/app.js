@@ -50,7 +50,7 @@ app.listen(port, () => {
 });
 
 
-const Employee = require('./models/Employee'); // Assuming your Employee model is in a file named 'models/Employee.js'
+const Employee = require('./model/employee'); // Assuming your Employee model is in a file named 'models/Employee.js'
 
 const createAdmin = async () => {
   try {
