@@ -97,6 +97,11 @@ function EmployeesComponent() {
     }
   };
 
+  useEffect(() => {
+    console.log("Updated Employees:", employees);
+  }, [employees]); // Log whenever employees change
+  
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Employee Directory</h1>
