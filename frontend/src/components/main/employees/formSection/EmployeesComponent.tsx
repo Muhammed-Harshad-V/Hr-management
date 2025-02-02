@@ -95,6 +95,7 @@ function EmployeesComponent() {
 
   useEffect(() => {
     console.log(currentEmployees)
+    console.log(`indexOfFirstEmployee: ${indexOfFirstEmployee}, indexOfLastEmployee: ${indexOfLastEmployee}`)
   }, [currentEmployees]); // Log whenever employees change
   
 
