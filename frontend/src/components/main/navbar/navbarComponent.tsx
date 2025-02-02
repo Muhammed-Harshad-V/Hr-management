@@ -42,25 +42,6 @@ const NavbarComponent = () => {
     };
   }, [socket]);
 
-  // Check window size on resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setIsSidebarOpen(false); // Close sidebar if window width is less than 1024px
-      } else {
-        setIsSidebarOpen(true);
-      }
-    };
-
-
-    // Add event listener for resize
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   // Handle logout
   const handleLogout = async () => {

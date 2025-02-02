@@ -93,6 +93,8 @@ function EmployeesComponent() {
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
   setCurrentEmployees(filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee));
 }, [employees, searchTerm, currentPage, filteredEmployees]); // Recalculate when these change
+
+
   const handleEditEmployee = (id: string) => {
     navigate(`/dashboard/employees/update/${id}`);
   };
