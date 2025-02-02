@@ -31,6 +31,7 @@ function EmployeesComponent() {
     try {
       setLoading(true);
       const response = await APIClientPrivate.get("/employeeService/employees"); // Replace with your API endpoint
+      console.log(response.data)
       setEmployees(response.data || []); // Assuming `response.data` contains the list of employees
       setError("");
         } catch (err: any) {
@@ -43,6 +44,7 @@ function EmployeesComponent() {
   // Fetch data on component mount
   useEffect(() => {
     fetchEmployees();
+    console.log(employees)
   }, []);
 
   // Filter employees based on search term
