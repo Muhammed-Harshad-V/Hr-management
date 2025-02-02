@@ -10,17 +10,18 @@ require('dotenv').config();
 const cors = require('cors');
 
 
-const app = express();
+const app = express()
 const port = process.env.PORT || 3001;
 startUserService()
 
 app.use(cors({
     origin: ['https://h-yq1e.onrender.com', 'https://gateway-production-bca1.up.railway.app'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)
 }));
 
+app.options('*', cors()); // Explicitly handle OPTIONS requests
 
 
 

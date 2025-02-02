@@ -9,10 +9,12 @@ const TIMEOUT = 120000;
 // Allow credentials and specify allowed origin
 app.use(cors({
     origin: 'https://h-yq1e.onrender.com', // Your frontend's URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)
 }));
+
+app.options('*', cors()); // Explicitly handle OPTIONS requests
 
 app.use('/employeeService', http('employee-service-production-edd9.up.railway.app', {
   timeout: TIMEOUT,
