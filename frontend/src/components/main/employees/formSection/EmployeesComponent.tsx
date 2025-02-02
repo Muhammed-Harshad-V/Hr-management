@@ -83,18 +83,16 @@ function EmployeesComponent() {
     setCurrentEmployees(filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee));
   }, [filteredEmployees, currentPage]); // Recalculate when these change
 
-  useEffect(() => {
-    console.log("Employees fetched: ", employees);
-  }, [employees]);
-  
-  useEffect(() => {
-    console.log("Filtered Employees: ", filteredEmployees);
-  }, [filteredEmployees]);
-  
-  useEffect(() => {
-    console.log("Current Employees: ", currentEmployees);
-  }, [currentEmployees]);
+ // Update filteredEmployees and currentEmployees whenever employees or searchTerm changes
+ useEffect(() => {
+  // Filter employees whenever searchTerm or employees changes
+  filterEmployees(searchTerm);
 
+  // Pagination: Update currentEmployees whenever filteredEmployees or currentPage changes
+  const indexOfLastEmployee = currentPage * itemsPerPage;
+  const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
+  setCurrentEmployees(filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee));
+}, [employees, searchTerm, currentPage, filteredEmployees]); // Recalculate when these change
   const handleEditEmployee = (id: string) => {
     navigate(`/dashboard/update/${id}`);
   };
