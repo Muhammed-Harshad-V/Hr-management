@@ -31,7 +31,6 @@ function EmployeesComponent() {
     try {
       setLoading(true);
       const response = await APIClientPrivate.get("/employeeService/employees"); // Replace with your API endpoint
-      console.log(response.data)
       setEmployees(response.data || []); // Assuming `response.data` contains the list of employees
       setError("");
         } catch (err: any) {
@@ -81,6 +80,7 @@ function EmployeesComponent() {
   const indexOfLastEmployee = currentPage * itemsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
   const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+  console.log(`currentEmployees: ${currentEmployees}`)
 
   const handleEditEmployee = (id: string) => {
     navigate(`/dashboard/update/${id}`);
