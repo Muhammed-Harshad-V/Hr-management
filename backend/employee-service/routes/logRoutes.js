@@ -8,9 +8,8 @@ const jwt = require('jsonwebtoken');
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log('ivide ethi')
         const employee = await Employee.findOne({ email }).select('+password');
-        console.log('getted')
+
 
 
         if (!employee) {
@@ -42,8 +41,8 @@ router.post('/login', async (req, res) => {
 
         res.cookie('token', token, {
             httpOnly: true, // Prevents JS access to the cookie
-            secure: false,  // Set to `true` in production with HTTPS
-            sameSite: 'Strict', // Prevents CSRF
+            secure: true,  // Set to `true` in production with HTTPS
+            sameSite: 'none', // Prevents CSRF
           });
 
         res.send({ token, employee });
