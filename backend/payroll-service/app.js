@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 3003;
 
 app.use(cors({
-    origin: 'https://gateway-production-bca1.up.railway.app/', // Your frontend's URL
+    origin: ['https://h-yq1e.onrender.com', 'https://gateway-production-bca1.up.railway.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)

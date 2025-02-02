@@ -18,13 +18,31 @@ app.use(cors({
 
 
 app.use('/employeeService', http('employee-service-production-edd9.up.railway.app', {
-  timeout: TIMEOUT
+  timeout: TIMEOUT,
+  proxyReqOptDecorator: (proxyReq, req) => {
+    // Add the CORS headers to the proxied request
+    proxyReq.setHeader('Access-Control-Allow-Origin', 'https://h-yq1e.onrender.com');
+    proxyReq.setHeader('Access-Control-Allow-Credentials', 'true');
+    return proxyReq;
+}
 }));
 app.use('/attendanceService', http('attendance-service-production.up.railway.app', {
-  timeout: TIMEOUT
+  timeout: TIMEOUT,
+  proxyReqOptDecorator: (proxyReq, req) => {
+    // Add the CORS headers to the proxied request
+    proxyReq.setHeader('Access-Control-Allow-Origin', 'https://h-yq1e.onrender.com');
+    proxyReq.setHeader('Access-Control-Allow-Credentials', 'true');
+    return proxyReq;
+}
 }));
 app.use('/payrollService', http('payroll-production-a39e.up.railway.app', {
-  timeout: TIMEOUT
+  timeout: TIMEOUT,
+  proxyReqOptDecorator: (proxyReq, req) => {
+    // Add the CORS headers to the proxied request
+    proxyReq.setHeader('Access-Control-Allow-Origin', 'https://h-yq1e.onrender.com');
+    proxyReq.setHeader('Access-Control-Allow-Credentials', 'true');
+    return proxyReq;
+}
 }));
 
 // app.use('/employeeService', http('http://localhost:3001', {
