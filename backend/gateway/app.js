@@ -26,7 +26,7 @@ app.use('/employeeService', http('https://employee-service-production-edd9.up.ra
   }
 }));
 
-app.use('/attendanceService', http('attendance-service-production.up.railway.app', {
+app.use('/attendanceService', http('https://attendance-service-production.up.railway.app', {
   timeout: TIMEOUT,
   proxyReqOptDecorator: (proxyReqOpts, req) => {
     // Modify the headers directly in proxyReqOpts
@@ -36,7 +36,7 @@ app.use('/attendanceService', http('attendance-service-production.up.railway.app
   }
 }));
 
-app.use('/payrollService', http('payroll-production-a39e.up.railway.app', {
+app.use('/payrollService', http('https://payroll-production-a39e.up.railway.app', {
   timeout: TIMEOUT,
   proxyReqOptDecorator: (proxyReqOpts, req) => {
     // Modify the headers directly in proxyReqOpts
