@@ -16,7 +16,7 @@ app.use(cors({
 
 app.options('*', cors()); // Explicitly handle OPTIONS requests
 
-app.use('/employeeService', http('employee-service-production-edd9.up.railway.app', {
+app.use('/employeeService', http('https://employee-service-production-edd9.up.railway.app', {
   timeout: TIMEOUT,
   proxyReqOptDecorator: (proxyReqOpts, req) => {
     // Modify the headers directly in proxyReqOpts
