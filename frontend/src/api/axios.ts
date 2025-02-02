@@ -1,7 +1,7 @@
 import axios from "axios";
 
- export const API_URL = "http://localhost:3000";
- export const S_api = "http://localhost:3002";
+ export const API_URL = "http://gateway:3000";
+ export const S_api = 'http://attendance-service:3002';
 
 const APIClientPrivate = axios.create({
     baseURL: API_URL,

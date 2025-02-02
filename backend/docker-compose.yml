@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Gateway Service
   gateway:
     build:
       context: ./gateway/
@@ -17,6 +18,7 @@ services:
     environment:
       - MONGO_URI=mongodb://mongo:27017/mydb
 
+  # Attendance Service
   attendance-service:
     build:
       context: ./attendance-service/
@@ -24,11 +26,13 @@ services:
     environment:
       - MURL=mongodb://mongo:27017/attendanceDB  # Using a dedicated DB
       - JWT_SECRET=qwertyuiopasdfghjklzxcvbnm
+      - RMQ_URL=amqps://uszqamll:ZS583QWOVfj1fe9TaJFdd79WoRCoVCmA@fuji.lmq.cloudamqp.com/uszqamll
     depends_on:
       - mongo
     networks:
       - microservice-network
 
+  # Employee Service
   employee-service:
     build:
       context: ./employee-service/
@@ -36,11 +40,13 @@ services:
     environment:
       - MURL=mongodb://mongo:27017/employeeDB  # Using a dedicated DB
       - JWT_SECRET=qwertyuiopasdfghjklzxcvbnm
+      - RMQ_URL=amqps://uszqamll:ZS583QWOVfj1fe9TaJFdd79WoRCoVCmA@fuji.lmq.cloudamqp.com/uszqamll
     depends_on:
       - mongo
     networks:
       - microservice-network
 
+  # Payroll Service
   payroll-service:
     build:
       context: ./payroll-service/
@@ -53,6 +59,7 @@ services:
     networks:
       - microservice-network
 
+  # MongoDB Service
   mongo:
     image: mongo:latest
     volumes:
@@ -61,6 +68,7 @@ services:
       - "27017:27017"  # Expose MongoDB on the default port for internal and external access
     networks:
       - microservice-network
+
 
 volumes:
   mongodb_data:  # This will persist MongoDB data

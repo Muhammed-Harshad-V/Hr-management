@@ -6,7 +6,13 @@ const initSocket = (server) => {
     return; // Prevent multiple initializations
   }
 
-  io = require('socket.io')(server); // Initialize socket.io with the server instance
+  io = require('socket.io')(server, {
+    cors: {
+      origin: "http://frontend:5173", // Allow your frontend URL
+      methods: ["GET", "POST"],
+      credentials: true,  // Allow cookies/auth headers if needed
+    }
+  });
   console.log("Socket.io initialized");
 
   // Handle connections here

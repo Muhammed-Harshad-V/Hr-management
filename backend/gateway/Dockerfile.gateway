@@ -4,17 +4,17 @@ FROM node:23
 # Set working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json from the current directory into the container
+# Copy the gateway package.json and package-lock.json
 COPY ./package*.json ./
 
-# Install dependencies
+# Install dependencies for the gateway
 RUN npm install
 
-# Copy the rest of the backend service code from the current folder into the container
+# Copy the gateway code
 COPY . .
 
 # Expose the port the app will run on
 EXPOSE 3000
 
-# Run the app
+# Start the gateway (app)
 CMD ["npm", "start"]

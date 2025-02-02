@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const cors = require('cors');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const http = require('http');
@@ -22,13 +21,7 @@ const server = http.createServer(app);  // Create HTTP server
 
 const port = process.env.PORT || 3002;
 
-// Middleware
-app.use(cors({
-  origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers
-  credentials: true  // Allow credentials (cookies, authorization headers)
-}));
+
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use('/', attendance);  // Your routes for handling attendance
