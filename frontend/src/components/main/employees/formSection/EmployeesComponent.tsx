@@ -11,7 +11,7 @@ interface Employee {
   email: string;
   position: string;
   department: string;
-  salary: string;
+  salary: number;
   status: "active" | "inactive"; // Adjust this based on actual status values
   hireDate: string;
 }
@@ -24,7 +24,7 @@ function EmployeesComponent() {
   const [error, setError] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(5); // You can adjust the page size here
+  const [itemsPerPage] = useState<number>(10); // You can adjust the page size here
 
   // Fetch employees from the backend
   const fetchEmployees = async () => {
@@ -38,6 +38,7 @@ function EmployeesComponent() {
           handleApiError(err, setError)
     } finally {
       setLoading(false);
+      console.log(employees)
     }
   };
 
@@ -80,6 +81,8 @@ function EmployeesComponent() {
   const indexOfLastEmployee = currentPage * itemsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
   const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+  console.log(currentEmployees)
+  console.log(`1`)
 
   const handleEditEmployee = (id: string) => {
     navigate(`/dashboard/update/${id}`);
