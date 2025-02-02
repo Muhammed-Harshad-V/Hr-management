@@ -20,6 +20,7 @@ function EmployeesComponent() {
   const navigate = useNavigate();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
+  const [currentEmployees, setCurrentEmployees] = useState<Employee[]>([]); // Track paginated employees
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -33,8 +34,8 @@ function EmployeesComponent() {
       const response = await APIClientPrivate.get("/employeeService/employees"); // Replace with your API endpoint
       setEmployees(response.data || []); // Assuming `response.data` contains the list of employees
       setError("");
-        } catch (err: any) {
-          handleApiError(err, setError)
+    } catch (err: any) {
+      handleApiError(err, setError);
     } finally {
       setLoading(false);
     }
@@ -75,10 +76,17 @@ function EmployeesComponent() {
     setCurrentPage(newPage);
   };
 
-  // Get current employees to be displayed on the page
-  const indexOfLastEmployee = currentPage * itemsPerPage;
-  const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-  const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+  // Update currentEmployees whenever filteredEmployees or currentPage changes
+  useEffect(() => {
+    const indexOfLastEmployee = currentPage * itemsPerPage;
+    const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
+    setCurrentEmployees(filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee));
+  }, [filteredEmployees, currentPage]); // Recalculate when these change
+
+  // Log the current employees for debugging
+  useEffect(() => {
+    console.log("Current Employees:", currentEmployees);
+  }, [currentEmployees]);
 
   const handleEditEmployee = (id: string) => {
     navigate(`/dashboard/update/${id}`);
@@ -92,12 +100,6 @@ function EmployeesComponent() {
       setError("Failed to Remove Employee. Please try again later.");
     }
   };
-
-  useEffect(() => {
-    console.log(currentEmployees)
-    console.log(`indexOfFirstEmployee: ${indexOfFirstEmployee}, indexOfLastEmployee: ${indexOfLastEmployee}`)
-  }, [currentEmployees]); // Log whenever employees change
-  
 
   return (
     <div className="p-4">
@@ -121,17 +123,6 @@ function EmployeesComponent() {
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <div className="relative overflow-x-auto rounded-md">
-          {/* Invisible scrollbar styling */}
-          <style>
-            {`
-              ::-webkit-scrollbar {
-                display: none;
-              }
-              -ms-overflow-style: none; /* Internet Explorer 10+ */
-              scrollbar-width: none; /* Firefox */
-            `}
-          </style>
-
           <Table className="w-full border rounded-md">
             <TableHeader>
               <TableRow>
@@ -142,7 +133,7 @@ function EmployeesComponent() {
                 <TableHead>Salary</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Hire Date</TableHead>
-                <TableHead>Actions</TableHead> {/* New Actions Column */}
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -156,18 +147,13 @@ function EmployeesComponent() {
                     <TableCell>{employee.salary}</TableCell>
                     <TableCell>
                       <span
-                        className={
-                          employee.status === "active"
-                            ? "text-green-600"
-                            : "text-yellow-600"
-                        }
+                        className={employee.status === "active" ? "text-green-600" : "text-yellow-600"}
                       >
                         {employee.status}
                       </span>
                     </TableCell>
                     <TableCell>{new Date(employee.hireDate).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      {/* Action buttons */}
                       <button
                         onClick={() => handleEditEmployee(employee._id)}
                         className="text-blue-500 hover:text-blue-600 mr-2"
@@ -205,7 +191,7 @@ function EmployeesComponent() {
             </TableFooter>
           </Table>
 
-          {/* Centered Pagination */}
+          {/* Pagination */}
           <div className="flex justify-center mt-4">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
