@@ -4,7 +4,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "concurrently \"node --watch app.js\" \"node --watch ../attendance-service/app.js\" \"node --watch ../employee-service/app.js\" \"node --watch ../payroll-service/app.js\"",
+    "start:dev": "node --trace-warnings --watch app.js",
     "start": "node --watch app.js"
   },
   "keywords": [],

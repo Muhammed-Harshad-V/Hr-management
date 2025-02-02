@@ -21,8 +21,8 @@ app.use('/employeeService', http('employee-service-production-edd9.up.railway.ap
   timeout: TIMEOUT,
   proxyReqOptDecorator: (proxyReq, req) => {
     // Add the CORS headers to the proxied request
-    proxyReq.set('Access-Control-Allow-Origin', 'https://h-yq1e.onrender.com');
-    proxyReq.set('Access-Control-Allow-Credentials', 'true');
+    proxyReq.setHeader('Access-Control-Allow-Origin', 'https://h-yq1e.onrender.com');
+    proxyReq.setHeader('Access-Control-Allow-Credentials', 'true');
     return proxyReq;
 }
 }));
