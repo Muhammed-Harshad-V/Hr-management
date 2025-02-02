@@ -31,14 +31,12 @@ function EmployeesComponent() {
     try {
       setLoading(true);
       const response = await APIClientPrivate.get("/employeeService/employees"); // Replace with your API endpoint
-      console.log(response.data);
       setEmployees(response.data || []); // Assuming `response.data` contains the list of employees
       setError("");
         } catch (err: any) {
           handleApiError(err, setError)
     } finally {
       setLoading(false);
-      console.log(employees)
     }
   };
 
@@ -81,8 +79,6 @@ function EmployeesComponent() {
   const indexOfLastEmployee = currentPage * itemsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
   const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
-  console.log(currentEmployees)
-  console.log(`1`)
 
   const handleEditEmployee = (id: string) => {
     navigate(`/dashboard/update/${id}`);
@@ -98,8 +94,8 @@ function EmployeesComponent() {
   };
 
   useEffect(() => {
-    console.log("Updated Employees:", employees);
-  }, [employees]); // Log whenever employees change
+    console.log(currentEmployees)
+  }, [currentEmployees]); // Log whenever employees change
   
 
   return (
