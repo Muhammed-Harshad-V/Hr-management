@@ -83,9 +83,16 @@ function EmployeesComponent() {
     setCurrentEmployees(filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee));
   }, [filteredEmployees, currentPage]); // Recalculate when these change
 
-  // Log the current employees for debugging
   useEffect(() => {
-    console.log("Current Employees:", currentEmployees);
+    console.log("Employees fetched: ", employees);
+  }, [employees]);
+  
+  useEffect(() => {
+    console.log("Filtered Employees: ", filteredEmployees);
+  }, [filteredEmployees]);
+  
+  useEffect(() => {
+    console.log("Current Employees: ", currentEmployees);
   }, [currentEmployees]);
 
   const handleEditEmployee = (id: string) => {
