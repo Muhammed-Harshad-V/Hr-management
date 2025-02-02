@@ -28,7 +28,6 @@ app.use('/', attendance);  // Your routes for handling attendance
 
 // MongoDB connection
 const dbURI = process.env.MURL;
-console.log({ dbURI });  // Log the URI to check if it's loaded properly
 mongoose.connect(dbURI)
   .then(() => console.log('MongoDB connected...'))
   .catch(err => {
