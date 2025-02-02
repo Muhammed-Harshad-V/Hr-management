@@ -1,5 +1,7 @@
 // Utility function to handle API errors
-export const handleApiError = (err: any, setError: React.Dispatch<React.SetStateAction<string>>) => {
+import { AxiosError } from 'axios';
+
+export const handleApiError = (err: AxiosError, setError: React.Dispatch<React.SetStateAction<string>>) => {
     if (err.response) {
       // If there is a response, check the status code to determine the error message
       switch (err.response.status) {
@@ -15,8 +17,10 @@ export const handleApiError = (err: any, setError: React.Dispatch<React.SetState
         case 500:
           setError("500 Server Error. Please try again later.");
           break;
-        default:
-          setError(`Error: ${err.response.data.message || "Something went wrong."}`);
+        default: {
+          const errorMessage = (err.response.data as { message?: string }).message || "Something went wrong.";
+          setError(`Error: ${errorMessage}`);
+        }
       }
     } else if (err.request) {
       // If the request was made but no response was received

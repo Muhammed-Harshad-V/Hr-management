@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const http = require('http');
 const {initSocket} = require('./socket.io')
+const cors = require('cors');
 
 
 // Import your routes and models
@@ -20,6 +21,13 @@ const server = http.createServer(app);  // Create HTTP server
   initSocket(server);
 
 const port = process.env.PORT || 3002;
+
+app.use(cors({
+    origin: 'https://gateway-production-bca1.up.railway.app/', // Your frontend's URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true // Allow credentials (cookies, authorization headers)
+}));
 
 
 app.use(cookieParser());

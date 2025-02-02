@@ -8,7 +8,7 @@ const initSocket = (server) => {
 
   io = require('socket.io')(server, {
     cors: {
-      origin: "http://frontend:5173", // Allow your frontend URL
+      origin: "https://hr-management-7ut0.onrender.com", // Allow your frontend URL
       methods: ["GET", "POST"],
       credentials: true,  // Allow cookies/auth headers if needed
     }

@@ -9,7 +9,7 @@ const TIMEOUT = 120000;
 
 // Allow credentials and specify allowed origin
 app.use(cors({
-    origin: 'http://localhost:5173', // Your frontend's URL
+    origin: 'https://hr-management-7ut0.onrender.com', // Your frontend's URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
     credentials: true // Allow credentials (cookies, authorization headers)
@@ -17,13 +17,13 @@ app.use(cors({
 
 
 
-app.use('/employeeService', http('http://employee-service:3001', {
+app.use('/employeeService', http('employee-service-production-edd9.up.railway.app', {
   timeout: TIMEOUT
 }));
-app.use('/attendanceService', http('http://attendance-service:3002', {
+app.use('/attendanceService', http('attendance-service-production.up.railway.app', {
   timeout: TIMEOUT
 }));
-app.use('/payrollService', http('http://payroll-service:3003', {
+app.use('/payrollService', http('payroll-production-a39e.up.railway.app', {
   timeout: TIMEOUT
 }));
 
