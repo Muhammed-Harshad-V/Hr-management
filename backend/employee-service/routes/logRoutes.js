@@ -8,7 +8,9 @@ const jwt = require('jsonwebtoken');
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log('ivide ethi')
         const employee = await Employee.findOne({ email }).select('+password');
+        console.log('getted')
 
 
         if (!employee) {
