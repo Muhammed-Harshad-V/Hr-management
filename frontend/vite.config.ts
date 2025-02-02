@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  base: "/dashboard",  // Ensuring the app is served from the '/dashboard' route
   plugins: [react()],
   resolve: {
     alias: {
